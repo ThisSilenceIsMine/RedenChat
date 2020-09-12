@@ -7,5 +7,10 @@
         <file>qml/LoginForm/Login.qml</file>
         <file>qml/LoginForm/qmldir</file>
         <file>qml/fonts/jaapokkisubtract-regular.ttf</file>
+        <file>qml/icons/visibility-24px.svg</file>
+        <file>qml/icons/visibility_off-24px.svg</file>
+        <file>qml/icons/visibility_off-white.svg</file>
+        <file>qml/icons/visibility-white.svg</file>
+        <file>qml/icons/warning-red.svg</file>
     </qresource>
 </RCC>

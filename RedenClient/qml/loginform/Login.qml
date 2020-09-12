@@ -3,6 +3,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import QtQuick.Layouts 1.12
+import QtQuick.Controls.Styles 1.4
 Rectangle
 {
     id: root
@@ -20,7 +21,7 @@ Rectangle
 
         Rectangle
         {
-            color: Material.color(Material.DeepOrange)
+            color: Material.color(Material.Red)
             width: 450
             height: 200
             anchors.right: background.right
@@ -32,7 +33,7 @@ Rectangle
 
         Label {
             id: logo_text
-            color: Material.color(Material.DeepOrange)
+            color: Material.color(Material.Red)
             text: "R E D E N"
             font.family: starsetFont.name
             anchors.horizontalCenter: parent.horizontalCenter
@@ -63,34 +64,89 @@ Rectangle
             Layout.minimumWidth: 150
             Layout.fillHeight: false
             Layout.fillWidth: false
-            anchors.horizontalCenter: parent.horizontalCenter
+            //            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             Material.accent: accent
             width: 150
+            Row
+            {
+                id: loginErrorString
+                anchors.top: login_input.bottom
+                visible: false
+                spacing: 7
+                Image
+                {
+                    source: "../icons/warning-red.svg"
+                }
+
+                Label
+                {
+                    text: qsTr("Логин обязателен")
+                    color: Material.color(Material.Red)
+                }
+            }
+            onTextChanged: {
+                loginErrorString.visible = false
+                login_input.accent = Material.color(Material.Teal)
+            }
         }
 
-            TextField
-            {
-                id: password_input
-                property var accent: Material.color(Material.Teal)
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("password line")
-                Layout.minimumHeight: 40
-                Layout.minimumWidth: 150
-                echoMode: "Password"
-                width: 150
-                Material.accent: accent
-            }
+        TextField
+        {
+            id: password_input
+            property var accent: Material.color(Material.Teal)
+            //anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
+            text: qsTr("password line")
+            Layout.minimumHeight: 40
+            Layout.minimumWidth: 150
+            echoMode: show_password_checkbox.checked ? TextInput.Normal : TextInput.Password
+            width: 150
+            Material.accent: accent
+
             CheckBox
             {
                 id: show_password_checkbox
+                anchors.top: password_input.top
                 anchors.left: password_input.right
-                text: qsTr("Показывать пароль")
+                anchors.topMargin: 10
+                //text: qsTr("Показывать пароль")
+                Material.accent: Material.color(Material.DeepOrange)
+
+                indicator: Image {
+                    id: checkBoxImage
+                    source: show_password_checkbox.checked ? "../icons/visibility-white.svg" : "../icons/visibility_off-white.svg"
+                }
+
             }
+
+            Row
+            {
+                id: pwErrorString
+                anchors.top: password_input.bottom
+                visible: false
+                spacing: 7
+                Image
+                {
+                    source: "../icons/warning-red.svg"
+                }
+
+                Label
+                {
+                    text: qsTr("Пароль обязателен")
+                    color: Material.color(Material.Red)
+                }
+            }
+            onTextChanged: {
+                pwErrorString.visible = false
+                password_input.accent = Material.color(Material.Teal)
+            }
+        }
 
         ColumnLayout
         {
             Layout.fillHeight: false
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
 
             spacing: 15
             Button
@@ -110,9 +166,15 @@ Rectangle
                 }
                 onClicked: {
                     if(login_input.text == "")
+                    {
                         login_input.accent = Material.color(Material.Red)
+                        loginErrorString.visible = true
+                    }
                     if(password_input.text == "")
+                    {
                         password_input.accent = Material.color(Material.Red)
+                        pwErrorString.visible = true
+                    }
                 }
             }
             Button
