@@ -6,5 +6,6 @@
         <file>qtquickcontrols2.conf</file>
         <file>qml/LoginForm/Login.qml</file>
         <file>qml/LoginForm/qmldir</file>
+        <file>qml/fonts/jaapokkisubtract-regular.ttf</file>
     </qresource>
 </RCC>
