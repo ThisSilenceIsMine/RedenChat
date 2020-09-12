@@ -4,6 +4,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import LoginForm 1.0
+import RegisterForm 1.0
 Window {
     id:root
     //Material.theme: Material.Dark

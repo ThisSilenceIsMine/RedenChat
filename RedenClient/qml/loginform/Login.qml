@@ -4,6 +4,7 @@ import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
+import ErrorString 1.0
 Rectangle
 {
     id: root
@@ -68,29 +69,37 @@ Rectangle
             Layout.alignment: Qt.AlignHCenter
             Material.accent: accent
             width: 150
-            Row
+            ErrorString
             {
                 id: loginErrorString
                 anchors.top: login_input.bottom
                 visible: false
-                spacing: 7
-                Image
-                {
-                    source: "../icons/warning-red.svg"
-                }
+                text: qsTr("Логин обязателен")
+            }
+            //            Row
+            //            {
+            //                id: loginErrorString
+            //                anchors.top: login_input.bottom
+            //                visible: false
+            //                spacing: 7
+            //                Image
+            //                {
+            //                    source: "../icons/warning-red.svg"
+            //                }
 
-                Label
-                {
-                    text: qsTr("Логин обязателен")
-                    color: Material.color(Material.Red)
-                }
-            }
-            onTextChanged: {
-                loginErrorString.visible = false
-                login_input.accent = Material.color(Material.Teal)
-            }
+            //                Label
+            //                {
+            //                    text: qsTr("Логин обязателен")
+            //                    color: Material.color(Material.Red)
+            //                }
+            //            }
+            //            onTextChanged: {
+            //                loginErrorString.visible = false
+            //                login_input.accent = Material.color(Material.Teal)
+            //            }
+            //        }
+
         }
-
         TextField
         {
             id: password_input

@@ -12,5 +12,9 @@
         <file>qml/icons/visibility_off-white.svg</file>
         <file>qml/icons/visibility-white.svg</file>
         <file>qml/icons/warning-red.svg</file>
+        <file>qml/RegisterForm/qmldir</file>
+        <file>qml/RegisterForm/RegisterForm.qml</file>
+        <file>qml/ErrorString/ErrorString.qml</file>
+        <file>qml/ErrorString/qmldir</file>
     </qresource>
 </RCC>
