@@ -76,42 +76,23 @@ Rectangle
                 visible: false
                 text: qsTr("Логин обязателен")
             }
-            //            Row
-            //            {
-            //                id: loginErrorString
-            //                anchors.top: login_input.bottom
-            //                visible: false
-            //                spacing: 7
-            //                Image
-            //                {
-            //                    source: "../icons/warning-red.svg"
-            //                }
 
-            //                Label
-            //                {
-            //                    text: qsTr("Логин обязателен")
-            //                    color: Material.color(Material.Red)
-            //                }
-            //            }
-            //            onTextChanged: {
-            //                loginErrorString.visible = false
-            //                login_input.accent = Material.color(Material.Teal)
-            //            }
-            //        }
 
         }
         TextField
         {
             id: password_input
             property var accent: Material.color(Material.Teal)
-            //anchors.horizontalCenter: parent.horizontalCenter
-            Layout.alignment: Qt.AlignHCenter
-            text: qsTr("password line")
             Layout.minimumHeight: 40
             Layout.minimumWidth: 150
-            echoMode: show_password_checkbox.checked ? TextInput.Normal : TextInput.Password
+            Layout.alignment: Qt.AlignHCenter
             width: 150
             Material.accent: accent
+
+            text: qsTr("password line")
+
+            echoMode: show_password_checkbox.checked ? TextInput.Normal : TextInput.Password
+
 
             CheckBox
             {
@@ -129,23 +110,15 @@ Rectangle
 
             }
 
-            Row
+            ErrorString
             {
                 id: pwErrorString
                 anchors.top: password_input.bottom
                 visible: false
-                spacing: 7
-                Image
-                {
-                    source: "../icons/warning-red.svg"
-                }
-
-                Label
-                {
-                    text: qsTr("Пароль обязателен")
-                    color: Material.color(Material.Red)
-                }
+                text: qsTr("Пароль обязателен")
             }
+
+
             onTextChanged: {
                 pwErrorString.visible = false
                 password_input.accent = Material.color(Material.Teal)

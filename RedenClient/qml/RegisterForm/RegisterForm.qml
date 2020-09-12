@@ -4,15 +4,15 @@ import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
-
+import ErrorString 1.0
 Rectangle
 {
     id: root
-    //color: Material.backgroundColor
     implicitWidth:  GlobalSettings.loginFormWidth
     implicitHeight: GlobalSettings.loginFormHeight
     visible: true
     FontLoader { id: starsetFont; source: "../fonts/jaapokkisubtract-regular.ttf" }
+
     Rectangle
     {
         id: background
@@ -59,19 +59,86 @@ Rectangle
         TextField
         {
             id: inputLogin
+            property var accent: Material.color(Material.Teal)
+            Layout.minimumHeight: 40
+            Layout.minimumWidth: 150
+            Layout.alignment: Qt.AlignHCenter
+            width: 150
+            Material.accent: accent
+            ErrorString
+            {
+                id: loginErrorString
+                anchors.top: password_input.bottom
+                visible: false
+                text: qsTr("Логин обязателен")
+            }
         }
         TextField
         {
             id: inputPassword
+            property var accent: Material.color(Material.Teal)
+            Layout.minimumHeight: 40
+            Layout.minimumWidth: 150
+            Layout.alignment: Qt.AlignHCenter
+            width: 150
+            Material.accent: accent
+            ErrorString
+            {
+                id: pwErrorString
+                anchors.top: password_input.bottom
+                visible: false
+                text: qsTr("Пароль обязателен")
+            }
         }
         TextField
         {
             id: confirmPassword
+            property var accent: Material.color(Material.Teal)
+            Layout.minimumHeight: 40
+            Layout.minimumWidth: 150
+            Layout.alignment: Qt.AlignHCenter
+            width: 150
+            Material.accent: accent
+            ErrorString
+            {
+                id: pwcErrorString
+                anchors.top: password_input.bottom
+                visible: false
+                text: parent.text == inputPassword.text ? qsTr("Подтверждения пароля обязательно") : qsTr("пароли должны совпадать")
+            }
         }
 
         TextField
         {
             id: inputNickname
+            property var accent: Material.color(Material.Teal)
+            Layout.minimumHeight: 40
+            Layout.minimumWidth: 150
+            Layout.alignment: Qt.AlignHCenter
+            width: 150
+            Material.accent: accent
+            ErrorString
+            {
+                id: nicknameErrorString
+                anchors.top: password_input.bottom
+                visible: false
+                text: qsTr("Введите никнейм")
+            }
+        }
+
+        Button
+        {
+            id: confirmRegistration
+            text: qsTr("Регистрация")
+            contentItem: Text {
+                text: parent.text
+                font: parent.font
+                opacity: enabled ? 1.0 : 0.3
+                color: parent.down ? "#FA8072" : "#FFFFFF"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
         }
     }
 }
