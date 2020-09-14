@@ -13,6 +13,7 @@ Rectangle
     implicitHeight: GlobalSettings.loginFormHeight
     visible: true
     FontLoader { id: starsetFont; source: "../fonts/jaapokkisubtract-regular.ttf" }
+    signal auth(string login, string password)
     Rectangle
     {
         id: background
@@ -146,18 +147,29 @@ Rectangle
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
                 }
-                onClicked: {
-                    if(login_input.text == "")
+                function checkFields()
+                {
+                    function checkField(field, errorHandler)
                     {
-                        login_input.accent = Material.color(Material.Red)
-                        loginErrorString.visible = true
+                        if(field.text === "")
+                        {
+                            field.accent = Material.color(Material.Red)
+                            errorHandler.visible = true
+                            return false;
+                        }
+                        return true;
                     }
-                    if(password_input.text == "")
-                    {
-                        password_input.accent = Material.color(Material.Red)
-                        pwErrorString.visible = true
-                    }
+
+                    var check_rezult = checkField(login_input, loginErrorString)
+                                     & checkField(password_input, pwErrorString);
+
+                    return check_rezult;
                 }
+                onClicked: {
+                    if(checkFields())
+                        auth(login_input.text, password_input.text);
+                }
+
             }
             Button
             {

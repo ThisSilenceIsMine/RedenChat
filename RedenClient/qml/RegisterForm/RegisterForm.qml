@@ -12,6 +12,7 @@ Rectangle
     implicitHeight: GlobalSettings.loginFormHeight
     visible: true
     FontLoader { id: starsetFont; source: "../fonts/jaapokkisubtract-regular.ttf" }
+    signal registerNew(string login, string pw, string nickname)
 
     Rectangle
     {
@@ -65,12 +66,39 @@ Rectangle
             Layout.alignment: Qt.AlignHCenter
             width: 150
             Material.accent: accent
+            placeholderText: qsTr("Логин")
             ErrorString
             {
                 id: loginErrorString
-                anchors.top: password_input.bottom
+                anchors.top: inputLogin.bottom
                 visible: false
                 text: qsTr("Логин обязателен")
+            }
+            onTextChanged: {
+                loginErrorString.visible = false
+                inputLogin.accent = Material.color(Material.Teal)
+            }
+        }
+        TextField
+        {
+            id: inputNickname
+            property var accent: Material.color(Material.Teal)
+            Layout.minimumHeight: 40
+            Layout.minimumWidth: 150
+            Layout.alignment: Qt.AlignHCenter
+            width: 150
+            Material.accent: accent
+            placeholderText: qsTr("Никнейм")
+            ErrorString
+            {
+                id: nicknameErrorString
+                anchors.top: inputNickname.bottom
+                visible: false
+                text: qsTr("Введите никнейм")
+            }
+            onTextChanged: {
+                nicknameErrorString.visible = false
+                inputNickname.accent = Material.color(Material.Teal)
             }
         }
         TextField
@@ -82,12 +110,33 @@ Rectangle
             Layout.alignment: Qt.AlignHCenter
             width: 150
             Material.accent: accent
+            placeholderText: qsTr("Пароль")
+            echoMode: show_password_checkbox.checked ? TextInput.Normal : TextInput.Password
+            CheckBox
+            {
+                id: show_password_checkbox
+                anchors.top: inputPassword.top
+                anchors.left: inputPassword.right
+                anchors.topMargin: 10
+                //text: qsTr("Показывать пароль")
+                Material.accent: Material.color(Material.DeepOrange)
+
+                indicator: Image {
+                    id: checkBoxImage
+                    source: show_password_checkbox.checked ? "../icons/visibility-white.svg" : "../icons/visibility_off-white.svg"
+                }
+
+            }
             ErrorString
             {
                 id: pwErrorString
-                anchors.top: password_input.bottom
+                anchors.top: inputPassword.bottom
                 visible: false
                 text: qsTr("Пароль обязателен")
+            }
+            onTextChanged: {
+                pwErrorString.visible = false
+                inputPassword.accent = Material.color(Material.Teal)
             }
         }
         TextField
@@ -99,36 +148,38 @@ Rectangle
             Layout.alignment: Qt.AlignHCenter
             width: 150
             Material.accent: accent
+            placeholderText: qsTr("Подтвердите пароль")
+            echoMode: TextInput.Password
             ErrorString
             {
                 id: pwcErrorString
-                anchors.top: password_input.bottom
+                anchors.top: confirmPassword.bottom
                 visible: false
-                text: parent.text == inputPassword.text ? qsTr("Подтверждения пароля обязательно") : qsTr("пароли должны совпадать")
+                text: confirmPassword.text == inputPassword.text ? qsTr("Подтверждения пароля обязательно") : qsTr("Пароли должны совпадать")
+                function checkConditions()
+                {
+                    if(confirmPassword.text != inputPassword.text)
+                    {
+                        pwcErrorString.text = qsTr("Пароли должны совпадать")
+                        visible = true
+                    }
+                    else if(confirmPassword.text == "")
+                    {
+                        pwcErrorString.text = qsTr("Подтверждение пароля обязательно")
+                        visible = true
+                    }
+                }
             }
-        }
-
-        TextField
-        {
-            id: inputNickname
-            property var accent: Material.color(Material.Teal)
-            Layout.minimumHeight: 40
-            Layout.minimumWidth: 150
-            Layout.alignment: Qt.AlignHCenter
-            width: 150
-            Material.accent: accent
-            ErrorString
-            {
-                id: nicknameErrorString
-                anchors.top: password_input.bottom
-                visible: false
-                text: qsTr("Введите никнейм")
+            onTextChanged: {
+                pwcErrorString.visible = false
+                confirmPassword.accent = Material.color(Material.Teal)
             }
         }
 
         Button
         {
             id: confirmRegistration
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Регистрация")
             contentItem: Text {
                 text: parent.text
@@ -138,6 +189,31 @@ Rectangle
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
+            }
+
+            function checkFields()
+            {
+                function checkField(field, errorHandler)
+                {
+                    if(field.text === "")
+                    {
+                        field.accent = Material.color(Material.Red)
+                        errorHandler.visible = true
+                        return false;
+                    }
+                    return true;
+                }
+
+                var check_rezult = checkField(inputLogin, loginErrorString)
+                        & checkField(inputPassword, pwErrorString)
+                        & checkField(confirmPassword, pwcErrorString)
+                        & checkField(inputNickname, nicknameErrorString);
+                return check_rezult;
+            }
+
+            onClicked: {
+                checkFields(); //Если true - пытаемся зарегать
+                pwcErrorString.checkConditions();
             }
         }
     }
