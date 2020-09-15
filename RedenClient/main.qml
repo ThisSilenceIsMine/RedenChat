@@ -5,17 +5,60 @@ import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import LoginForm 1.0
 import RegisterForm 1.0
-Window {
+ApplicationWindow {
     id:root
     //Material.theme: Material.Dark
-    width: GlobalSettings.loginFormWidth
-    height: GlobalSettings.loginFormHeight
-    visible: true
-//    title: qsTr("Hello World")
-
-    RegisterForm
-    {
+    background: Rectangle {
         anchors.fill: parent
-
+        color: Material.backgroundColor
     }
+
+    width: GlobalSettings.defaultFormWidth
+    height: GlobalSettings.defaultFormHeight
+    visible: true
+    title: qsTr("Reden")
+
+    StackView
+    {
+        id: stackView
+        anchors.fill: parent
+        initialItem: loginForm
+        property real offset: 10
+
+        pushEnter: Transition {
+            id: pushEnter
+
+        }
+        popEnter: Transition {
+            id: popEnter
+
+        }
+
+        pushExit: Transition {
+            id: pushExit
+
+        }
+        popExit: Transition {
+            id: popExit
+        }
+
+        RegisterForm
+        {
+            id: registerForm
+            onRegisterNew: {
+                stackView.pop()
+            }
+            onBack: {
+                stackView.pop()
+            }
+        }
+        Login{
+            id: loginForm
+            onGotoRegister: {
+                stackView.push(registerForm)
+            }
+        }
+    }
+
 }
+

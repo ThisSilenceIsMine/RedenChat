@@ -9,11 +9,13 @@ Rectangle
 {
     id: root
     //color: Material.backgroundColor
-    implicitWidth:  GlobalSettings.loginFormWidth
-    implicitHeight: GlobalSettings.loginFormHeight
+    implicitWidth:  GlobalSettings.defaultFormWidth
+    implicitHeight: GlobalSettings.defaultFormHeight
     visible: true
     FontLoader { id: starsetFont; source: "../fonts/jaapokkisubtract-regular.ttf" }
     signal auth(string login, string password)
+    signal gotoRegister()
+
     Rectangle
     {
         id: background
@@ -183,6 +185,9 @@ Rectangle
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
+                }
+                onClicked: {
+                    gotoRegister()
                 }
             }
         }

@@ -8,11 +8,12 @@ import ErrorString 1.0
 Rectangle
 {
     id: root
-    implicitWidth:  GlobalSettings.loginFormWidth
-    implicitHeight: GlobalSettings.loginFormHeight
+    implicitWidth:  GlobalSettings.defaultFormWidth
+    implicitHeight: GlobalSettings.defaultFormHeight
     visible: true
     FontLoader { id: starsetFont; source: "../fonts/jaapokkisubtract-regular.ttf" }
     signal registerNew(string login, string pw, string nickname)
+    signal back()
 
     Rectangle
     {
@@ -26,11 +27,11 @@ Rectangle
             color: Material.color(Material.Red)
             width: 450
             height: 200
-            anchors.right: background.right
-            anchors.rightMargin: -150
+            anchors.left: background.left
+            anchors.leftMargin: -150
             anchors.top: background.top
             anchors.topMargin: -150
-            rotation: 45
+            rotation: -45
         }
 
         Label {
@@ -55,7 +56,7 @@ Rectangle
         anchors.bottomMargin: 120
 
         width: parent.width / 2 + parent.width / 4
-        spacing: 2
+        spacing: 1
 
         TextField
         {
@@ -162,12 +163,15 @@ Rectangle
                     {
                         pwcErrorString.text = qsTr("Пароли должны совпадать")
                         visible = true
+                        return false
                     }
                     else if(confirmPassword.text == "")
                     {
                         pwcErrorString.text = qsTr("Подтверждение пароля обязательно")
                         visible = true
+                        return false
                     }
+                    return true
                 }
             }
             onTextChanged: {
@@ -212,8 +216,28 @@ Rectangle
             }
 
             onClicked: {
-                checkFields(); //Если true - пытаемся зарегать
-                pwcErrorString.checkConditions();
+                if(checkFields() && pwcErrorString.checkConditions()) //Если true - пытаемся зарегать
+                    //Ну типа регаем
+                    registerNew(inputLogin.text, inputPassword.text, inputNickname.text)
+            }
+        }
+        Button
+        {
+            id: backButton
+            Layout.alignment: Qt.AlignHCenter
+            text: qsTr("Назад")
+            contentItem: Text {
+                text: parent.text
+                font: parent.font
+                opacity: enabled ? 1.0 : 0.3
+                color: parent.down ? "#FA8072" : "#FFFFFF"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+
+            onClicked: {
+                    back()
             }
         }
     }
