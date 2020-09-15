@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
+import MessengerForm.MessageInputField 1.0
 
 Rectangle
 {
@@ -14,20 +15,31 @@ Rectangle
         anchors.fill: parent
 
         handle: Rectangle {
-            implicitWidth: 2
+            implicitWidth: 3
             implicitHeight: 4
-            color: SplitHandle.pressed ? Material.color(Material.DeepOrange)//"#81e889"
+            color: SplitHandle.pressed ? Material.color(Material.Grey)//"#81e889"
                                        : (SplitHandle.hovered ?
-                                              Qt.lighter(Material.color(Material.Orange), 1.1)
-                                                :        Material.color(Material.Orange))
+                                              Qt.lighter(Material.color(Material.Grey), 1.1)
+                                                :        "555555")
         }
         Rectangle {
-            implicitWidth: 150
+            id: contactsField
+            implicitWidth: 300
             color: Material.backgroundColor
         }
         Rectangle {
+            id: chatField
             implicitWidth: 50
             color: Qt.lighter(Material.backgroundColor)
+            MessageInputField
+            {
+                anchors.leftMargin: 10
+                anchors.rightMargin: 10
+                anchors.bottomMargin: 10
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+            }
         }
     }
 }
