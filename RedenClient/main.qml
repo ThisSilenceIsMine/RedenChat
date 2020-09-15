@@ -5,9 +5,11 @@ import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import Authentication.LoginForm 1.0
 import Authentication.RegisterForm 1.0
+import MessengerForm 1.0
+
 ApplicationWindow {
     id:root
-    //Material.theme: Material.Dark
+//    flags: Qt.FramelessWindowHint //Quite complex shit. Implement later
     background: Rectangle {
         anchors.fill: parent
         color: Material.backgroundColor
@@ -25,37 +27,26 @@ ApplicationWindow {
         initialItem: loginForm
         property real offset: 10
 
-        pushEnter: Transition {
-            id: pushEnter
-
-        }
-        popEnter: Transition {
-            id: popEnter
-        }
-
-        pushExit: Transition {
-            id: pushExit
-
-        }
-        popExit: Transition {
-            id: popExit
-        }
-
-        RegisterForm
+//        RegisterForm
+//        {
+//            id: registerForm
+//            onRegisterNew: {
+//                stackView.pop()
+//            }
+//            onBack: {
+//                stackView.pop()
+//            }
+//        }
+//        Login
+//        {
+//            id: loginForm
+//            onGotoRegister: {
+//                stackView.push(registerForm)
+//            }
+//        }
+        MessengerForm
         {
-            id: registerForm
-            onRegisterNew: {
-                stackView.pop()
-            }
-            onBack: {
-                stackView.pop()
-            }
-        }
-        Login{
-            id: loginForm
-            onGotoRegister: {
-                stackView.push(registerForm)
-            }
+            id: mainForm
         }
     }
 

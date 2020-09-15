@@ -24,5 +24,8 @@
         <file>qml/MessengerForm/MessagesView/MessagesView.qml</file>
         <file>qml/MessengerForm/MessagesView/qmldir</file>
         <file>qml/MessengerForm/qmldir</file>
+        <file>qml/MessengerForm/MessengerForm.qml</file>
+        <file>qml/MessengerForm/MessageInputField/MessageInputField.qml</file>
+        <file>qml/MessengerForm/MessageInputField/qmldir</file>
     </qresource>
 </RCC>

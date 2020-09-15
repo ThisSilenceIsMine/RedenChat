@@ -6,5 +6,8 @@ import GlobalQmlSettings 1.0
 
 Rectangle
 {
-
+    TextArea
+    {
+        anchors.fill: parent
+    }
 }
