@@ -3,8 +3,8 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
-import LoginForm 1.0
-import RegisterForm 1.0
+import Authentication.LoginForm 1.0
+import Authentication.RegisterForm 1.0
 ApplicationWindow {
     id:root
     //Material.theme: Material.Dark
@@ -31,7 +31,6 @@ ApplicationWindow {
         }
         popEnter: Transition {
             id: popEnter
-
         }
 
         pushExit: Transition {

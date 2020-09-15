@@ -4,17 +4,25 @@
         <file>qml/GlobalQmlSettings/qmldir</file>
         <file>qml/GlobalQmlSettings/GlobalSettings.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>qml/LoginForm/Login.qml</file>
-        <file>qml/LoginForm/qmldir</file>
         <file>qml/fonts/jaapokkisubtract-regular.ttf</file>
         <file>qml/icons/visibility-24px.svg</file>
         <file>qml/icons/visibility_off-24px.svg</file>
         <file>qml/icons/visibility_off-white.svg</file>
         <file>qml/icons/visibility-white.svg</file>
         <file>qml/icons/warning-red.svg</file>
-        <file>qml/RegisterForm/qmldir</file>
-        <file>qml/RegisterForm/RegisterForm.qml</file>
         <file>qml/ErrorString/ErrorString.qml</file>
         <file>qml/ErrorString/qmldir</file>
+        <file>qml/Authentication/LoginForm/Login.qml</file>
+        <file>qml/Authentication/LoginForm/qmldir</file>
+        <file>qml/Authentication/RegisterForm/qmldir</file>
+        <file>qml/Authentication/RegisterForm/RegisterForm.qml</file>
+        <file>qml/Authentication/qmldir</file>
+        <file>qml/MessengerForm/ContactsView/ContactsDelegate.qml</file>
+        <file>qml/MessengerForm/ContactsView/ContactsView.qml</file>
+        <file>qml/MessengerForm/ContactsView/qmldir</file>
+        <file>qml/MessengerForm/MessagesView/MessagesDelegate.qml</file>
+        <file>qml/MessengerForm/MessagesView/MessagesView.qml</file>
+        <file>qml/MessengerForm/MessagesView/qmldir</file>
+        <file>qml/MessengerForm/qmldir</file>
     </qresource>
 </RCC>
