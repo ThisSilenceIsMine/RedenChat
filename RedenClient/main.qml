@@ -9,7 +9,7 @@ import MessengerForm 1.0
 
 ApplicationWindow {
     id:root
-//    flags: Qt.FramelessWindowHint //Quite complex shit. Implement later
+    //    flags: Qt.FramelessWindowHint //Quite complex shit. Implement later
     background: Rectangle {
         anchors.fill: parent
         color: Material.backgroundColor
@@ -24,31 +24,48 @@ ApplicationWindow {
     {
         id: stackView
         anchors.fill: parent
-        initialItem: loginForm
+        initialItem: loginFormStackComponent
         property real offset: 10
-
-//        RegisterForm
-//        {
-//            id: registerForm
-//            onRegisterNew: {
-//                stackView.pop()
-//            }
-//            onBack: {
-//                stackView.pop()
-//            }
-//        }
-//        Login
-//        {
-//            id: loginForm
-//            onGotoRegister: {
-//                stackView.push(registerForm)
-//            }
-//        }
-        MessengerForm
+        Component
         {
-            id: mainForm
+            id: mainFormStackComponent
+            MessengerForm
+            {
+                id: mainForm
+            }
+        }
+        Component
+        {
+            id: registerFormStackComponent
+            RegisterForm
+            {
+                id: registerForm
+                onRegisterNew: {
+                    stackView.pop()
+                }
+                onBack: {
+                    stackView.pop()
+                }
+            }
+        }
+        Component
+        {
+            id: loginFormStackComponent
+            Login
+            {
+                id: loginForm
+                onGotoRegister: {
+                    stackView.push(registerFormStackComponent)
+                }
+                onAuth: {
+                    if(stackView.depth > 1)
+                        stackView.pop()
+                    stackView.push(mainFormStackComponent)
+                }
+            }
         }
     }
+
 
 }
 

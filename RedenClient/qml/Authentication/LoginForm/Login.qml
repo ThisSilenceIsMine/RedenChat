@@ -12,7 +12,7 @@ Rectangle
     implicitWidth:  GlobalSettings.defaultFormWidth
     implicitHeight: GlobalSettings.defaultFormHeight
     visible: true
-    FontLoader { id: starsetFont; source: "../fonts/jaapokkisubtract-regular.ttf" }
+    FontLoader { id: starsetFont; source: "../../fonts/jaapokkisubtract-regular.ttf" }
     signal auth(string login, string password)
     signal gotoRegister()
 
@@ -108,7 +108,7 @@ Rectangle
 
                 indicator: Image {
                     id: checkBoxImage
-                    source: show_password_checkbox.checked ? "../icons/visibility-white.svg" : "../icons/visibility_off-white.svg"
+                    source: show_password_checkbox.checked ? "../../icons/visibility-white.svg" : "../../icons/visibility_off-white.svg"
                 }
 
             }
