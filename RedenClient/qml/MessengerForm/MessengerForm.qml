@@ -30,7 +30,7 @@ Rectangle
         Rectangle {
             id: chatField
             implicitWidth: 50
-            color: Qt.lighter(Material.backgroundColor)
+            color: Material.backgroundColor
             MessageInputField
             {
                 anchors.leftMargin: 10

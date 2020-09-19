@@ -27,5 +27,12 @@
         <file>qml/MessengerForm/MessengerForm.qml</file>
         <file>qml/MessengerForm/MessageInputField/MessageInputField.qml</file>
         <file>qml/MessengerForm/MessageInputField/qmldir</file>
+        <file>qml/MessengerForm/MessageInputField/SmilePicker/GetModel.js</file>
+        <file>qml/MessengerForm/MessageInputField/SmilePicker/qmldir</file>
+        <file>qml/MessengerForm/MessageInputField/SmilePicker/SmilePicker.qml</file>
+        <file>qml/MessengerForm/MessageInputField/SmilePicker/SmilesModel.qml</file>
+        <file>qml/icons/send-white-18dp.svg</file>
+        <file>qml/icons/send-white-48dp.svg</file>
+        <file>qml/icons/insert_emoticon-white-48dp.svg</file>
     </qresource>
 </RCC>
