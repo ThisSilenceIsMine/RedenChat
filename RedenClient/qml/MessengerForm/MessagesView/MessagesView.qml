@@ -4,7 +4,14 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 
-Rectangle
+ListView
 {
+    id: root
+    property alias delegateColor: messagesDelegate.color
+
+    delegate: MessagesDelegate
+    {
+        id: messagesDelegate
+    }
 
 }

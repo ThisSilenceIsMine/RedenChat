@@ -6,6 +6,7 @@ QtObject {
     readonly property int    defaultFormHeight: 720
     readonly property int    loginFormWidth: 540
     readonly property int    loginFormHeight: 680
+    readonly property string username: "NekoLover"
     //readonly property string starsetFont: starsetFont.name
     //readonly property alias starsetFont: starsetFont
 

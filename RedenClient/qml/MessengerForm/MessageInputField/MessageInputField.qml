@@ -18,16 +18,45 @@ Rectangle
         spacing: 5
         anchors.fill: parent
         readonly property int btnSize: 32
+        Rectangle
+        {
+            id: addFilesBtn
+            z: 5
+            Layout.leftMargin: 5
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+            Layout.preferredWidth: rowLayout.btnSize
+            Layout.preferredHeight: rowLayout.btnSize
+            color: addFilesBtnArea.hovered ?
+                       "#390000"
+                     : Qt.lighter(Material.backgroundColor)
+
+            Image
+            {
+                id: addFilesBtnImage
+                width: rowLayout.btnSize
+                height: rowLayout.btnSize
+                anchors.centerIn: parent
+                source: "qrc:/qml/icons/add_circle_outline-white-48dp"
+            }
+            TapHandler
+            {
+                id: addFilesBtnArea
+//                    anchors.fill: parent
+//                    hoverEnabled: true
+//                    z: 5
+
+            }
+        }
         Flickable
         {
             id: scrollView
 
-            Layout.preferredWidth: root.width - rowLayout.btnSize * 2 - rowLayout.spacing * 2
+            Layout.preferredWidth: root.width - rowLayout.btnSize * 3 - rowLayout.spacing * 2 - 12
             Layout.fillHeight: true
             flickableDirection: Flickable.VerticalFlick
             TextArea.flickable: TextArea
             {
-                property var accent: Material.color(Material.Teal)
+                property var accent: Material.color(Material.DeepOrange)
                 id: textArea
                 selectionColor: Material.color(Material.LightBlue)
                 selectedTextColor: "white"

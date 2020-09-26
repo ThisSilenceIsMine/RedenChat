@@ -34,5 +34,6 @@
         <file>qml/icons/send-white-18dp.svg</file>
         <file>qml/icons/send-white-48dp.svg</file>
         <file>qml/icons/insert_emoticon-white-48dp.svg</file>
+        <file>qml/icons/add_circle_outline-white-48dp.svg</file>
     </qresource>
 </RCC>

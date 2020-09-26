@@ -4,6 +4,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import MessengerForm.MessageInputField 1.0
+import MessengerForm.MessagesView 1.0
 
 Rectangle
 {
@@ -31,8 +32,51 @@ Rectangle
             id: chatField
             implicitWidth: 50
             color: Material.backgroundColor
+            ListModel
+            {
+                id: sampleMessageModel
+
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "Raiden"
+                    // @disable-check M16
+                    timeStamp: "22:13"
+                    // @disable-check M16
+                    text: "Heloo, ma friend"
+
+                }
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "Vasya"
+                    // @disable-check M16
+                    timeStamp: "22:15"
+                    // @disable-check M16
+                    text: "Hail 2 U, my very best friend, this is quite a long debugging text"
+                }
+
+            }
+
+            ListView
+            {
+                anchors.fill: parent
+                anchors.bottomMargin: messageInput.height
+                anchors.leftMargin: 5
+                id: messagesView
+                model: sampleMessageModel
+                spacing: 10
+                delegate: MessagesDelegate
+                {
+                    time: model.timeStamp
+                    username: model.nickname
+                    messageText: model.text
+                }
+            }
+
             MessageInputField
             {
+                id: messageInput
                 anchors.leftMargin: 10
                 anchors.rightMargin: 10
                 anchors.bottomMargin: 10
