@@ -9,7 +9,7 @@ import GlobalQmlSettings 1.0
 Rectangle
 {
     id: root
-
+    
     //property alias imageSource: optionalContentImage.source
     property alias avatarSource: avatar.source
     property alias username: senderNickname.text
