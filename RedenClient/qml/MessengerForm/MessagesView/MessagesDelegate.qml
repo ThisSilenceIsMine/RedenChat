@@ -50,7 +50,10 @@ Rectangle
         Rectangle
         {
             id: messageContent
+            anchors.left: avatar.right
+            anchors.leftMargin: 5
             Layout.alignment: Qt.AlignLeft
+            //Layout.leftMargin: 5
             Label
             {
                 id: senderNickname
@@ -68,7 +71,7 @@ Rectangle
             {
                 id: messageText
                 anchors.fill: parent
-                anchors.topMargin: (timeSpan.height + senderNickname.height) / 2
+                anchors.topMargin: (timeSpan.height + senderNickname.height) / 1.5
                 color: "#ffffff"
             }
             Image

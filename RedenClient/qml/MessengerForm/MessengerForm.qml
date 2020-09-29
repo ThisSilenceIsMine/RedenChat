@@ -12,6 +12,8 @@ Rectangle
     id: root
     height: GlobalSettings.defaultFormHeight
     width: GlobalSettings.defaultFormWidth
+    FontLoader { id: starsetFont; source: "../fonts/jaapokkisubtract-regular.ttf" }
+    FontLoader { id: emojiFont; source: "../fonts/OpenSansEmoji.ttf" }
     SplitView {
         id: splitView
         anchors.fill: parent
@@ -28,6 +30,16 @@ Rectangle
             id: contactsField
             implicitWidth: 300
             color: Material.backgroundColor
+            Label {
+                id: logo_text
+                color: Material.color(Material.Red)
+                text: "R E D E N"
+                font.family: starsetFont.name
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                font.pointSize: 32
+                anchors.topMargin: 10
+            }
         }
         Rectangle {
             id: chatField
@@ -78,11 +90,11 @@ Rectangle
             {
                 id: messagesView
                 anchors.fill: parent
-                anchors.bottomMargin: messageInput.height + 5
+                anchors.bottomMargin: messageInput.height + 75
                 anchors.leftMargin: 5
                 anchors.rightMargin: 5
                 model: sampleMessageModel
-                spacing: 10
+                spacing: 75
                 verticalLayoutDirection: ListView.BottomToTop
                 delegate: MessagesDelegate
                     {

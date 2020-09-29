@@ -12,6 +12,7 @@ Rectangle
     height: textArea.contentHeight + 25
     border.color: Material.backgroundColor
     radius: 8
+    FontLoader { id: emojiFont; source: "qrc:/qml/fonts/OpenSansEmoji.ttf" }
     RowLayout
     {
         id: rowLayout
@@ -58,11 +59,13 @@ Rectangle
             {
                 property var accent: Material.color(Material.DeepOrange)
                 id: textArea
+                font.family: emojiFont.name
+                font.pointSize: 16
                 selectionColor: Material.color(Material.LightBlue)
                 selectedTextColor: "white"
                 wrapMode: Text.WordWrap
                 Material.accent: accent
-                //text: "\u2601"
+                text: "☺"
                 placeholderText: qsTr("Написать сообщение...")
             }
 
