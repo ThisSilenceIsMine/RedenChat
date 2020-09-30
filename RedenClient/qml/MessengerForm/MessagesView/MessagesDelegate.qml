@@ -16,6 +16,15 @@ Rectangle
     property alias time: timeSpan.text
     property alias messageText: messageText.text
 
+    Rectangle
+    {
+        id: delimiter
+        height: 1
+        width: rowLayout.width
+        color: Qt.lighter(Material.backgroundColor)
+        anchors.bottom: rowLayout.top
+        anchors.bottomMargin: 20
+    }
 
     RowLayout
     {
@@ -25,8 +34,8 @@ Rectangle
         Image
         {
             id: avatar
-            Layout.preferredWidth: 50
-            Layout.preferredHeight: 50
+            Layout.preferredWidth: 40
+            Layout.preferredHeight: 40
             Layout.alignment: Qt.AlignLeft
             property bool rounded: true
             property bool adapt: true
