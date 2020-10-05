@@ -5,16 +5,17 @@ import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
 import QtGraphicalEffects 1.0
 import GlobalQmlSettings 1.0
+import MessengerForm.RoundImage 1.0
 
 Rectangle
 {
     id: root
 
     //property alias imageSource: optionalContentImage.source
-    property alias avatarSource: avatar.source
-    property alias username: senderNickname.text
-    property alias time: timeSpan.text
-    property alias messageText: messageText.text
+    property string avatarSource
+    property string username
+    property string time
+    property string message
 
     Rectangle
     {
@@ -31,43 +32,31 @@ Rectangle
         id: rowLayout
         spacing: 10
         anchors.fill: parent
-        Image
+        RoundImage
         {
             id: avatar
+            source: avatarSource
             Layout.preferredWidth: 40
             Layout.preferredHeight: 40
             Layout.alignment: Qt.AlignLeft
-            property bool rounded: true
-            property bool adapt: true
-            clip: true
-            fillMode: Image.PreserveAspectFit
-            layer.enabled: rounded
-                layer.effect: OpacityMask {
-                    maskSource: Item {
-                        width: avatar.width
-                        height: avatar.height
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: avatar.adapt ? avatar.width : Math.min(avatar.width, avatar.height)
-                            height: avatar.adapt ? avatar.height : width
-                            radius: Math.min(width, height)
-                        }
-                    }
-                }
         }
 
-        Rectangle
+        Item
         {
             id: messageContent
+
             anchors.left: avatar.right
+
             anchors.leftMargin: 5
-            Layout.alignment: Qt.AlignLeft
+            //Layout.alignment: Qt.AlignLeft
+            //Layout.leftMargin: 5
             //Layout.leftMargin: 5
             Label
             {
                 id: senderNickname
                 anchors.top: parent.top
                 anchors.left: parent.left
+                text: username
             }
             Label
             {
@@ -75,6 +64,7 @@ Rectangle
                 anchors.top: parent.top
                 anchors.left: senderNickname.right
                 anchors.leftMargin: 15
+                text: time
             }
             Text
             {
@@ -82,6 +72,7 @@ Rectangle
                 anchors.fill: parent
                 anchors.topMargin: (timeSpan.height + senderNickname.height) / 1.5
                 color: "#ffffff"
+                text: message
             }
             Image
             {

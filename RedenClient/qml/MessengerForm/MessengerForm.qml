@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.12
 import GlobalQmlSettings 1.0
 import MessengerForm.MessageInputField 1.0
 import MessengerForm.MessagesView 1.0
+import MessengerForm.ContactsView 1.0
 
 Rectangle
 {
@@ -39,6 +40,85 @@ Rectangle
                 anchors.top: parent.top
                 font.pointSize: 32
                 anchors.topMargin: 10
+            }
+            ListModel
+            {
+                id: sampleContactsModel
+
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "Vasya"
+
+                    // @disable-check M16
+                    avatar: "qrc:/qml/Images/Default"
+
+                }
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "Anton"
+
+                    // @disable-check M16
+                    avatar: "qrc:/qml/Images/Default"
+                }
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "$a$h@"
+
+                    // @disable-check M16
+                    avatar: "qrc:/qml/Images/Default"
+                }
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "Alex"
+
+                    // @disable-check M16
+                    avatar: "qrc:/qml/Images/Default"
+                }
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "Ivan"
+
+                    // @disable-check M16
+                    avatar: "qrc:/qml/Images/Default"
+                }
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "SuperCatGirlLover1337"
+
+                    // @disable-check M16
+                    avatar: "qrc:/qml/Images/Default"
+                }
+                ListElement
+                {
+                    // @disable-check M16
+                    nickname: "Some decnly long nickname"
+
+                    // @disable-check M16
+                    avatar: "qrc:/qml/Images/Default"
+                }
+
+
+            }
+            ListView
+            {
+                id: contactsView
+                model: sampleContactsModel
+                anchors.fill: parent
+                anchors.top: logo_text.bottom
+                anchors.topMargin: 5
+                spacing: 75
+                delegate: ContactsDelegate
+                {
+                    width: ListView.view.width
+                    avatarSource: model.avatar
+                    username: model.nickname
+                }
             }
         }
         Rectangle {
@@ -101,7 +181,7 @@ Rectangle
                         width: ListView.view.width
                         time: model.timeStamp
                         username: model.nickname
-                        messageText: model.text
+                        message: model.text
                         avatarSource: model.avatar
                     }
 

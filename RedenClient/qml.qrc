@@ -39,5 +39,9 @@
         <file>qml/Images/Default.png</file>
         <file>qml/fonts/OpenSansEmoji.ttf</file>
         <file>qml/fonts/NotoColorEmoji.ttf</file>
+        <file>qml/MessengerForm/IconClickHighlight/IconClickHighlight.qml</file>
+        <file>qml/MessengerForm/IconClickHighlight/qmldir</file>
+        <file>qml/MessengerForm/RoundImage/qmldir</file>
+        <file>qml/MessengerForm/RoundImage/RoundImage.qml</file>
     </qresource>
 </RCC>
