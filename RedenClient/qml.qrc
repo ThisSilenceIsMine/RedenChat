@@ -43,5 +43,10 @@
         <file>qml/MessengerForm/IconClickHighlight/qmldir</file>
         <file>qml/MessengerForm/RoundImage/qmldir</file>
         <file>qml/MessengerForm/RoundImage/RoundImage.qml</file>
+        <file>qml/icons/close-white.svg</file>
+        <file>qml/icons/fullscreen_exit-white.svg</file>
+        <file>qml/icons/fullscreen-white.svg</file>
+        <file>qml/icons/maximize-white.svg</file>
+        <file>qml/icons/minimize-white.svg</file>
     </qresource>
 </RCC>

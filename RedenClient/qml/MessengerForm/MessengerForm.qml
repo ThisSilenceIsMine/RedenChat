@@ -27,19 +27,23 @@ Rectangle
                                               Qt.lighter(Material.color(Material.Grey), 1.1)
                                             :        "555555")
         }
-        Rectangle {
+        Rectangle
+        {
             id: contactsField
             implicitWidth: 300
             color: Material.backgroundColor
-            Label {
+            Label
+            {
                 id: logo_text
                 color: Material.color(Material.Red)
                 text: "R E D E N"
                 font.family: starsetFont.name
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                font.pointSize: 32
                 anchors.topMargin: 10
+                //Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
+                font.pointSize: 32
+                //Layout.topMargin: 10
             }
             ListModel
             {
@@ -102,24 +106,47 @@ Rectangle
                     // @disable-check M16
                     avatar: "qrc:/qml/Images/Default"
                 }
-
-
             }
-            ListView
+            //            ListView
+            //            {
+            //                id: contactsView
+            //                model: sampleContactsModel
+
+            //                anchors.fill: parent
+            //                anchors.top: logo_text.bottom
+            //                anchors.topMargin: logo_text.height
+
+            //                spacing: 75
+            //                delegate: ContactsDelegate
+            //                {
+            //                    width: ListView.view.width
+            //                    avatarSource: model.avatar
+            //                    username: model.nickname
+            //                }
+//                            Component.onCompleted:
+//                            {
+//                                for(var i = 0; i < 20; ++i)
+//                                {
+//                                    sampleContactsModel.append({"nickname":"Some decent nickname", "avatar":"qrc:/qml/Images/Default"})
+//                                }
+//                            }
+//                        }
+            ContactsView
             {
                 id: contactsView
                 model: sampleContactsModel
                 anchors.fill: parent
                 anchors.top: logo_text.bottom
-                anchors.topMargin: 5
-                spacing: 75
-                delegate: ContactsDelegate
+                anchors.topMargin: logo_text.height
+                Component.onCompleted:
                 {
-                    width: ListView.view.width
-                    avatarSource: model.avatar
-                    username: model.nickname
+                    for(var i = 0; i < 20; ++i)
+                    {
+                        sampleContactsModel.append({"nickname":"Some decent nickname", "avatar":"qrc:/qml/Images/Default"})
+                    }
                 }
             }
+
         }
         Rectangle {
             id: chatField
@@ -177,13 +204,13 @@ Rectangle
                 spacing: 75
                 verticalLayoutDirection: ListView.BottomToTop
                 delegate: MessagesDelegate
-                    {
-                        width: ListView.view.width
-                        time: model.timeStamp
-                        username: model.nickname
-                        message: model.text
-                        avatarSource: model.avatar
-                    }
+                {
+                    width: ListView.view.width
+                    time: model.timeStamp
+                    username: model.nickname
+                    message: model.text
+                    avatarSource: model.avatar
+                }
 
             }
 

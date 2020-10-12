@@ -12,6 +12,10 @@ Rectangle
     id: root
     property string avatarSource
     property string username
+    //implicitHeight: rowLayout.height
+    height: 50
+    signal click()
+    color: Material.backgroundColor
     Rectangle
     {
         id: delimiter
@@ -19,7 +23,7 @@ Rectangle
         width: rowLayout.width
         color: Qt.lighter(Material.backgroundColor)
         anchors.bottom: rowLayout.top
-        anchors.bottomMargin: 20
+        anchors.bottomMargin: 10
     }
     RowLayout
     {
@@ -32,13 +36,24 @@ Rectangle
             Layout.preferredWidth: 40
             Layout.preferredHeight: 40
             Layout.leftMargin: 5
-            //Layout.alignment: Qt.AlignLeft
+            Layout.alignment: Qt.AlignLeft
         }
         Label
         {
             id: usernameLabel
             text: username
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
         }
+    }
+    MouseArea
+    {
+        id: area
+        anchors.fill: parent
+        z: 5
+
+    }
+    Component.onCompleted: {
+        area.clicked.connect(click)
     }
 }
