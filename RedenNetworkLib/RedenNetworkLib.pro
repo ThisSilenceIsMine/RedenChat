@@ -12,13 +12,16 @@ INCLUDEPATH += $$PWD/include
 
 
 SOURCES += \
+    src/connection.cpp \
     src/package.cpp \
     src/packagejsonserializer.cpp \
     src/redennetworklib.cpp
 
 HEADERS += \
+    include/IConnection.h \
     include/IPackageSerializer.h \
     include/RedenNetworkLib_global.h \
+    include/connection.h \
     include/package.h \
     include/packagejsonserializer.h \
     include/redennetworklib.h

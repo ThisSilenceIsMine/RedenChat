@@ -1,8 +1,8 @@
 #include "../include/package.h"
-
-Package::Package(QObject *parent) : QObject(parent)
+namespace net
 {
-}
+
+//Package::Package() {}
 
 QString Package::sender() const
 {
@@ -42,4 +42,6 @@ QVariant Package::data() const
 void Package::setData(const QVariant &data)
 {
     m_data = data;
+}
+
 }

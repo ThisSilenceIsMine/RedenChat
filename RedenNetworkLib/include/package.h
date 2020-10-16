@@ -1,13 +1,15 @@
 #ifndef PACKAGE_H
 #define PACKAGE_H
+#include "RedenNetworkLib_global.h"
 
 #include <QObject>
 #include <QVariant>
 #include <QVariantMap>
 #include <QJsonDocument>
 #include <QJsonObject>
+namespace net {
 
-class Package
+class REDENNETWORKLIB_EXPORT Package
 {
 public:
     enum DataType : int
@@ -23,6 +25,10 @@ public:
     Package() = default;
     Package(const Package&) = default;
     Package(Package&&) = default;
+
+    Package& operator=(const Package&) = default;
+    Package& operator=(Package&&) = default;
+public:
     QString sender() const;
     void setSender(const QString &sender);
 
@@ -41,5 +47,5 @@ private:
     DataType m_type;
     QVariant m_data;
 };
-
+}
 #endif // PACKAGE_H

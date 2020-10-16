@@ -6,6 +6,9 @@
 #include <QJsonObject>
 #include <QMetaEnum>
 
+namespace net
+{
+
 PackageJsonSerializer::PackageJsonSerializer()
 {
     m_types = QMetaEnum::fromType<Package::DataType>();
@@ -24,21 +27,40 @@ QByteArray PackageJsonSerializer::toBytes(Package package)
     return QJsonDocument::fromVariant(map).toJson();
 }
 
-Package PackageJsonSerializer::fromBytes(QByteArray bytes)
+Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
 {
-    QJsonDocument document { QJsonDocument::fromJson(bytes) };
-
     Package package;
-    QString sender = document["sender"].toString();
-    QStringList destinationsList = qvariant_cast<QStringList>(document["destinations"].toVariant());
-    Package::DataType type = static_cast<Package::DataType>(
-                                                            m_types.keyToValue(document["type"].toString().toLocal8Bit().data())
-                                                           );
-    QVariant data = document["data"].toVariant();
-    package.setSender(sender);
-    package.setDestinations(destinationsList);
-    package.setType(type);
-    package.setData(data);
+
+    QJsonParseError error;
+    QJsonDocument document { QJsonDocument::fromJson(bytes, &error) };
+
+    if(error.error != QJsonParseError::NoError)
+    {
+        *ok = false;
+        return package;
+    }
+
+    QJsonValue sender = document["sender"].toString();
+    QJsonValue destinationsList = document["destinations"];
+    QJsonValue type = document["type"];//static_cast<Package::DataType>(
+                        //                                    m_types.keyToValue(document["type"].toString().toLocal8Bit().data())
+                          //                                 );
+    QJsonValue data = document["data"];
+    if(sender == QJsonValue::Undefined
+       || destinationsList == QJsonValue::Undefined
+       || type == QJsonValue::Undefined
+       || data == QJsonValue::Undefined)
+    {
+        *ok = false;
+        return package;
+    }
+
+    package.setSender(sender.toString());
+    package.setDestinations(qvariant_cast<QStringList>(destinationsList.toVariant()));
+    package.setType(static_cast<Package::DataType>(m_types.keyToValue(type.toString().toLocal8Bit().data())));
+    package.setData(data.toVariant());
 
     return package;
+}
+
 }

@@ -3,12 +3,14 @@
 
 #include <QString>
 #include "package.h"
-
+namespace net
+{
 class IPackageSerializer
 {
+public:
     virtual QByteArray toBytes(Package package) = 0;
-    virtual Package fromBytes(QByteArray bytes) = 0;
+    virtual Package fromBytes(QByteArray bytes, bool* ok) = 0;
     virtual ~IPackageSerializer() = 0;
 };
-
+}
 #endif // IPACKAGESERIALIZER_H
