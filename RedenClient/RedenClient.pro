@@ -7,7 +7,11 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        main.cpp
+        main.cpp \
+        src/client.cpp \
+        src/contactslist.cpp \
+        src/contactsmodel.cpp \
+        src/userdata.cpp
 
 RESOURCES += qml.qrc
 
@@ -25,3 +29,17 @@ QML_DESIGNER_IMPORT_PATH =
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../RedenNetworkLib/release/ -lRedenNetworkLib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../RedenNetworkLib/debug/ -lRedenNetworkLib
+else:unix: LIBS += -L$$OUT_PWD/../RedenNetworkLib/ -lRedenNetworkLib
+
+INCLUDEPATH += $$PWD/../RedenNetworkLib
+DEPENDPATH += $$PWD/../RedenNetworkLib
+
+HEADERS += \
+    include/client.h \
+    include/contactslist.h \
+    include/contactsmodel.h \
+    include/globals.h \
+    include/userdata.h

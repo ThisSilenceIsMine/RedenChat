@@ -22,7 +22,7 @@ QByteArray PackageJsonSerializer::toBytes(Package package)
     map["sender"] = package.sender();
     map["destinations"] = QVariant(package.destinations());
     map["type"] = QVariant( m_types.valueToKey(package.type()) );
-    map["data"] = package.data();
+    map["data"] = package.data().toByteArray().toBase64();
 
     return QJsonDocument::fromVariant(map).toJson();
 }
@@ -42,14 +42,14 @@ Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
 
     QJsonValue sender = document["sender"].toString();
     QJsonValue destinationsList = document["destinations"];
-    QJsonValue type = document["type"];//static_cast<Package::DataType>(
-                        //                                    m_types.keyToValue(document["type"].toString().toLocal8Bit().data())
-                          //                                 );
+    QJsonValue type = document["type"];
     QJsonValue data = document["data"];
-    if(sender == QJsonValue::Undefined
-       || destinationsList == QJsonValue::Undefined
-       || type == QJsonValue::Undefined
-       || data == QJsonValue::Undefined)
+
+    if(   sender            == QJsonValue::Undefined
+       || destinationsList  == QJsonValue::Undefined
+       || type              == QJsonValue::Undefined
+       || data              == QJsonValue::Undefined
+      )
     {
         *ok = false;
         return package;
@@ -58,8 +58,8 @@ Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
     package.setSender(sender.toString());
     package.setDestinations(qvariant_cast<QStringList>(destinationsList.toVariant()));
     package.setType(static_cast<Package::DataType>(m_types.keyToValue(type.toString().toLocal8Bit().data())));
-    package.setData(data.toVariant());
-
+    package.setData(QByteArray::fromBase64(data.toVariant().toByteArray()));
+    *ok = true;
     return package;
 }
 

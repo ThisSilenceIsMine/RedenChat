@@ -14,8 +14,7 @@ INCLUDEPATH += $$PWD/include
 SOURCES += \
     src/connection.cpp \
     src/package.cpp \
-    src/packagejsonserializer.cpp \
-    src/redennetworklib.cpp
+    src/packagejsonserializer.cpp
 
 HEADERS += \
     include/IConnection.h \
@@ -23,8 +22,7 @@ HEADERS += \
     include/RedenNetworkLib_global.h \
     include/connection.h \
     include/package.h \
-    include/packagejsonserializer.h \
-    include/redennetworklib.h
+    include/packagejsonserializer.h
 
 # Default rules for deployment.
 unix {

@@ -11,16 +11,19 @@ namespace net {
 
 class REDENNETWORKLIB_EXPORT Package
 {
+    Q_GADGET
 public:
     enum DataType : int
     {
         REGISTRATION_REQUEST = 0,
         AUTH_REQUEST = 1,
-        USER_DATA = 2,
-        TEXT_MESSAGE = 3,
-        IMAGE = 4,
-        DOCUMENT = 5
+        MESSAGE_HISTORY,
+        USER_DATA,
+        TEXT_MESSAGE,
+        IMAGE,
+        DOCUMENT
     };
+    Q_ENUM(DataType)
 public:
     Package() = default;
     Package(const Package&) = default;
@@ -41,6 +44,7 @@ public:
     QVariant data() const;
     void setData(const QVariant &data);
 
+    static QString delimiter();
 private:
     QString m_sender;
     QStringList m_destinations;

@@ -44,4 +44,9 @@ void Package::setData(const QVariant &data)
     m_data = data;
 }
 
+QString Package::delimiter()
+{
+    return "$";
+}
+
 }

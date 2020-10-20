@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
+import QtQuick.Dialogs 1.2
 import QtGraphicalEffects 1.0
 import GlobalQmlSettings 1.0
 import MessengerForm.IconClickHighlight 1.0
@@ -14,6 +15,9 @@ Rectangle
     height: textArea.contentHeight + 25
     border.color: Material.backgroundColor
     radius: 8
+
+    signal fileSelected()
+
     FontLoader { id: emojiFont; source: "qrc:/qml/fonts/OpenSansEmoji.ttf" }
     RowLayout
     {
@@ -49,11 +53,26 @@ Rectangle
                     anchors.fill: parent
                     onClicked: {
                         fileHighlight.run()
+                        fileDialog.visible = true
                     }
                 }
             }
+            FileDialog
+            {
+                id: fileDialog
+                title: qsTr("Выберите файл")
+                folder: shortcuts.home
+                onAccepted: {
+                    console.log("You chose: " + fileDialog.fileUrls)
+                    Qt.quit()
+                }
+                onRejected:
+                {
+                    Qt.quit()
+                }
+            }
 
-        }
+        } //addFilesBtn
         Flickable
         {
             id: scrollView

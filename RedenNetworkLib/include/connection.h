@@ -14,7 +14,7 @@
 namespace net
 {
 
-class Connection : public QObject
+class REDENNETWORKLIB_EXPORT Connection : public QObject
 {
     Q_OBJECT
     enum ConnectionState
@@ -34,6 +34,8 @@ public:
     void setSerializer(IPackageSerializer *serializer);
 
     void setSocketDescriptor(qintptr descriptor);
+
+    void sendPackage(Package package);
 public slots:
     void connectToHost(QString host, quint16 port);
     void disconnect();
@@ -41,7 +43,7 @@ public slots:
     void messageReceived(const Package &package);
 signals:
     void readyForUse();
-    void newMessage(const Package &package);
+    void newPackage(const Package &package);
 
 private slots:
     void connected();
@@ -50,12 +52,11 @@ private slots:
     void stateChanged(QAbstractSocket::SocketState socketState);
     void readyRead();
 private:
-    QDataStream m_stream;
+    //QDataStream m_stream;
     QTcpSocket m_socket;
     IPackageSerializer *m_serializer;
     ConnectionState m_state;
-
-
+    quint16 m_blockSize;
 
 }; //class Connection
 

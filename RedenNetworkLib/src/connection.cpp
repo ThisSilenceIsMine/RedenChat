@@ -2,13 +2,12 @@
 namespace net
 {
 
-
 Connection::Connection(QObject *parent)
     : QObject(parent)
-    , m_stream{&m_socket}
+    //, m_stream{&m_socket}
 {
     m_serializer = new PackageJsonSerializer();
-    m_stream.setVersion(QDataStream::Qt_5_15);
+    //m_stream.setVersion(QDataStream::Qt_5_15);
 
     connect(&m_socket,&QTcpSocket::connected,this,&Connection::connected);
     connect(&m_socket,&QTcpSocket::disconnected,this,&Connection::disconnected);
@@ -22,10 +21,10 @@ Connection::Connection(QObject *parent)
 
 Connection::Connection(qintptr descriptor, QObject *parent)
     : QObject(parent)
-    , m_stream{&m_socket}
+    //, m_stream{&m_socket}
 {
     m_serializer = new PackageJsonSerializer();
-    m_stream.setVersion(QDataStream::Qt_5_15);
+    //m_stream.setVersion(QDataStream::Qt_5_15);
 
     connect(&m_socket,&QTcpSocket::connected,this,&Connection::connected);
     connect(&m_socket,&QTcpSocket::disconnected,this,&Connection::disconnected);
@@ -71,6 +70,7 @@ void Connection::connectToHost(QString host, quint16 port)
 void Connection::disconnect()
 {
     m_socket.disconnectFromHost();
+    emit disconnected();
 }
 
 void Connection::messageReceived(const Package &package)
@@ -81,6 +81,7 @@ void Connection::messageReceived(const Package &package)
 void Connection::connected()
 {
     m_state = ConnectionState::Connected;
+    emit readyForUse();
 }
 
 void Connection::disconnected()
@@ -98,25 +99,51 @@ void Connection::stateChanged(QAbstractSocket::SocketState socketState)
     Q_UNUSED(socketState)
 }
 
+void Connection::sendPackage(Package package)
+{
+    QByteArray block;
+    QByteArray rawData = m_serializer->toBytes(package);
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out << quint16(rawData.size()) << rawData;
+
+    m_socket.write(block);
+}
+
 void Connection::readyRead()
 {
-    Package message;
-    bool ok;
-    m_stream.startTransaction();
+    QDataStream in(&m_socket);
 
-        QByteArray rawData;
-        m_stream >> rawData;
-
-        message = m_serializer->fromBytes(rawData, &ok);
-
-        if(!ok)
+    if(m_blockSize == 0)
+    {
+        if(m_socket.bytesAvailable() < int(sizeof(quint16)))
         {
-            m_stream.abortTransaction();
+            return;
         }
 
-        emit newMessage(message);
+        in >> m_blockSize;
+    }
 
-    m_stream.commitTransaction();
+    if(m_socket.bytesAvailable() < m_blockSize)
+        return;
+    else
+        m_blockSize = 0;
+
+    QByteArray rawData;
+
+    in >> rawData;
+
+    Package message;
+    bool ok;
+
+    message = m_serializer->fromBytes(rawData, &ok);
+
+    if(!ok)
+    {
+        return;
+    }
+
+    emit newPackage(message);
 }
 
 }
