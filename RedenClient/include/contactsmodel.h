@@ -10,6 +10,7 @@
 class ContactsModel : public QAbstractListModel
 {
     Q_OBJECT
+//    Q_PROPERTY(ContactsList m_list READ list)
 public:
     enum Roles
     {

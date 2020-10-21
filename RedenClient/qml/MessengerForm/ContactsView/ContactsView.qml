@@ -60,6 +60,6 @@ ListView
         }
     }
     Component.onCompleted: console.log("idx = " + list.currentIndex)
-    onCurrentItemChanged: console.log(model.get(list.currentIndex).nickname + ' selected')
+    //onCurrentItemChanged: console.log(model.get(list.currentIndex).nickname + ' selected')
 
 }

@@ -8,6 +8,8 @@ import MessengerForm.MessageInputField 1.0
 import MessengerForm.MessagesView 1.0
 import MessengerForm.ContactsView 1.0
 
+import reden.models.contactsModel 1.0
+
 Rectangle
 {
     id: root
@@ -107,43 +109,20 @@ Rectangle
                     avatar: "qrc:/qml/Images/Default"
                 }
             }
-            //            ListView
-            //            {
-            //                id: contactsView
-            //                model: sampleContactsModel
 
-            //                anchors.fill: parent
-            //                anchors.top: logo_text.bottom
-            //                anchors.topMargin: logo_text.height
-
-            //                spacing: 75
-            //                delegate: ContactsDelegate
-            //                {
-            //                    width: ListView.view.width
-            //                    avatarSource: model.avatar
-            //                    username: model.nickname
-            //                }
-//                            Component.onCompleted:
-//                            {
-//                                for(var i = 0; i < 20; ++i)
-//                                {
-//                                    sampleContactsModel.append({"nickname":"Some decent nickname", "avatar":"qrc:/qml/Images/Default"})
-//                                }
-//                            }
-//                        }
             ContactsView
             {
                 id: contactsView
-                model: sampleContactsModel
+                model: contactsModel
                 anchors.fill: parent
                 anchors.top: logo_text.bottom
                 anchors.topMargin: logo_text.height
                 Component.onCompleted:
                 {
-                    for(var i = 0; i < 20; ++i)
-                    {
-                        sampleContactsModel.append({"nickname":"Some decent nickname", "avatar":"qrc:/qml/Images/Default"})
-                    }
+//                    for(var i = 0; i < 20; ++i)
+//                    {
+//                        sampleContactsModel.append({"nickname":"Some decent nickname", "avatar":"qrc:/qml/Images/Default"})
+//                    }
                 }
             }
 

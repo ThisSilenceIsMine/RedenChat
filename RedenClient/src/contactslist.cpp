@@ -19,7 +19,7 @@ bool ContactsList::setItemAt(int index, const Contact &item)
     return true;
 }
 
-QList<Contact> ContactsList::items() const
+QList<Contact> &ContactsList::items()
 {
     return m_items;
 }

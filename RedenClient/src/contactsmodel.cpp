@@ -1,4 +1,8 @@
 #include "../include/contactsmodel.h"
+#include <QDebug>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 ContactsModel::ContactsModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -20,6 +24,7 @@ QVariant ContactsModel::data(const QModelIndex &index, int role) const
     if(!index.isValid() || !m_list)
         return QVariant();
 
+    qDebug() << "Getting data at: " << index.row() << " with role " << role;
     const Contact &item = m_list->items().at(index.row());
 
     switch (role) {
@@ -30,14 +35,17 @@ QVariant ContactsModel::data(const QModelIndex &index, int role) const
         return QVariant(item.imageUrl);
     }
 
+
     return QVariant();
 }
 
 bool ContactsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if(!index.isValid() || !m_list)
+    {
+        qDebug() << "setData error: invalid index";
         return false;
-
+    }
     Contact item = m_list->items().at(index.row());
 
     switch (role) {
@@ -55,6 +63,7 @@ bool ContactsModel::setData(const QModelIndex &index, const QVariant &value, int
         emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
+    qDebug() << "cannot setItemAt in list";
     return false;
 }
 
@@ -67,7 +76,11 @@ bool ContactsModel::insertRows(int row, int count, const QModelIndex &parent)
     beginInsertRows(QModelIndex(), row, row+count-1);
 
     for(int i = 0; i < count; ++i)
+    {
+        qDebug() << "insertRows: invoked inner insert";
         m_list->items().insert(row,Contact{});
+    }
+    qDebug() << "insertRows: row count: " << m_list->items().size();
 
     endInsertRows();
     return true;
@@ -86,6 +99,8 @@ QHash<int, QByteArray> ContactsModel::roleNames() const
     QHash<int, QByteArray> roles;
     roles[NicknameRole] = "nickname";
     roles[ImageRole] = "avatar";
+
+    return roles;
 }
 
 ContactsList *ContactsModel::list() const
@@ -122,8 +137,21 @@ void ContactsModel::setList(ContactsList *list)
 
 void ContactsModel::append(const Contact &item)
 {
-    insertRows(this->rowCount({}),1,{});
-    setData(this->index(this->rowCount({})), QVariant(item.nickname), Roles::NicknameRole);
-    setData(this->index(this->rowCount({})), QVariant(item.imageUrl), Roles::ImageRole);
+    if(insertRows(this->rowCount({}),1,{}))
+        qDebug() << "Appending at " << this->rowCount({});
+
+    if(this->rowCount({}) == 0)
+    {
+        qDebug() << "fuck! model is empty!";
+    }
+    bool ok = 0;
+
+    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.nickname), Roles::NicknameRole);
+    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.imageUrl), Roles::ImageRole);
+
+    if(!ok)
+        qDebug() << "Set data not working!";
+
 }
+
 

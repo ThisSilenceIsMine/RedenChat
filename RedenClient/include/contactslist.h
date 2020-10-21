@@ -16,7 +16,7 @@ public:
 
     bool setItemAt(int index, const Contact &item);
 
-    QList<Contact> items() const;
+    QList<Contact> &items();
 
 signals:
     void preItemAppended();

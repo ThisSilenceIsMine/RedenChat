@@ -16,7 +16,7 @@ Connection::Connection(QObject *parent)
     connect(&m_socket,&QTcpSocket::readyRead,this,&Connection::readyRead);
     connect(&m_socket,qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::errorOccurred),this,&Connection::error);
 
-    connect(this, &Connection::newMessage, this, &Connection::messageReceived);
+    connect(this, &Connection::newPackage, this, &Connection::messageReceived);
 }
 
 Connection::Connection(qintptr descriptor, QObject *parent)
@@ -33,9 +33,9 @@ Connection::Connection(qintptr descriptor, QObject *parent)
     connect(&m_socket,&QTcpSocket::readyRead,this,&Connection::readyRead);
     connect(&m_socket,qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::errorOccurred),this,&Connection::error);
 
-    connect(this, &Connection::newMessage, this, &Connection::messageReceived);
+    connect(this, &Connection::newPackage, this, &Connection::messageReceived);
 
-    setSocketDescriptor(descriptor);
+    m_socket.setSocketDescriptor(descriptor);
 }
 
 quint16 Connection::port() const
@@ -60,6 +60,11 @@ void Connection::setSerializer(IPackageSerializer *serializer)
     m_serializer = serializer;
 }
 
+void Connection::setSocketDescriptor(qintptr descriptor)
+{
+    m_socket.setSocketDescriptor(descriptor);
+}
+
 void Connection::connectToHost(QString host, quint16 port)
 {
     if(m_socket.isOpen()) disconnect();
@@ -80,13 +85,12 @@ void Connection::messageReceived(const Package &package)
 
 void Connection::connected()
 {
-    m_state = ConnectionState::Connected;
     emit readyForUse();
 }
 
 void Connection::disconnected()
 {
-    m_state = ConnectionState::Disconnected;
+
 }
 
 void Connection::error(QAbstractSocket::SocketError socketError)
@@ -96,7 +100,7 @@ void Connection::error(QAbstractSocket::SocketError socketError)
 
 void Connection::stateChanged(QAbstractSocket::SocketState socketState)
 {
-    Q_UNUSED(socketState)
+    m_state = socketState;
 }
 
 void Connection::sendPackage(Package package)

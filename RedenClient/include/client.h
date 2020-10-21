@@ -6,6 +6,8 @@
 #include <QByteArray>
 #include <QVariant>
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 #include "include/RedenNetworkLib_global.h"
 #include "include/connection.h"
@@ -18,8 +20,9 @@ class Client : public QObject
 public:
     explicit Client(QObject *parent = nullptr);
 
-    ContactsList *contacts() const;
-    void setContacts(ContactsList *contacts);
+
+    ContactsModel *model() const;
+    void setModel(ContactsModel *model);
 
 public slots:
     void registerNewUser(QString username, QString password, QString imgUrl);
@@ -28,22 +31,26 @@ public slots:
     void sendMessage(QString text, QString reciver);
     void sendImage(QString url, QString reciver);
     void sendDocument(QString url, QString reciver);
+
+    void loadContactsList(QJsonArray json);
+    void loadMessageHistory(QByteArray json);
 private slots:
     void packageRecieved(net::Package package);
 signals:
     void registerResponded(bool status);
     void authResponded(bool status);
 private:
-    void loadMessageHistory(QString json);
+
+
     void addContact(QString contactData);
-    void newMessage(QString sender, QString text);
-    void newDocument(QString sender, QString base64);
-    void newImage(QString sender, QString base64);
+    void newMessage(QString sender, QByteArray text);
+    void newDocument(QString sender, QByteArray base64);
+    void newImage(QString sender, QByteArray base64);
 
 private:
     net::Connection m_connection;
     QString m_username;
-    ContactsList *m_contacts;
+    ContactsModel *m_model;
 
 
 };

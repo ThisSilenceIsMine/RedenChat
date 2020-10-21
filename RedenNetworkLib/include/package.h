@@ -18,6 +18,7 @@ public:
         REGISTRATION_REQUEST = 0,
         AUTH_REQUEST = 1,
         MESSAGE_HISTORY,
+        CONTACTS_LIST,
         USER_DATA,
         TEXT_MESSAGE,
         IMAGE,

@@ -17,12 +17,7 @@ namespace net
 class REDENNETWORKLIB_EXPORT Connection : public QObject
 {
     Q_OBJECT
-    enum ConnectionState
-    {
-        Connected,
-        Disconnected
-    };
-    Q_ENUM(ConnectionState)
+
 public:
     explicit Connection(QObject *parent = nullptr);
     Connection(qintptr handle, QObject *parent = nullptr);
@@ -55,7 +50,7 @@ private:
     //QDataStream m_stream;
     QTcpSocket m_socket;
     IPackageSerializer *m_serializer;
-    ConnectionState m_state;
+    QAbstractSocket::SocketState m_state;
     quint16 m_blockSize;
 
 }; //class Connection

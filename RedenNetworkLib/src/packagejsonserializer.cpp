@@ -1,4 +1,5 @@
 #include "../include/packagejsonserializer.h"
+#include "package.h"
 #include <QVariantMap>
 #include <QStringList>
 #include <QString>
@@ -61,6 +62,11 @@ Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
     package.setData(QByteArray::fromBase64(data.toVariant().toByteArray()));
     *ok = true;
     return package;
+}
+
+PackageJsonSerializer::~PackageJsonSerializer()
+{
+
 }
 
 }

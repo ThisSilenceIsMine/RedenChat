@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    qmlRegisterUncreatableType<ContactsList>("reden.models.contactsList",1,0,"ContactsList",QStringLiteral("ContactsList cannot be created in QML"));
+    //qmlRegisterUncreatableType<ContactsList>("reden.models.contactsList",1,0,"ContactsList",QStringLiteral("ContactsList cannot be created in QML"));
     qmlRegisterType<ContactsModel>("reden.models.contactsModel",1,0,"ContactsModel");
 
     engine.rootContext()->setContextProperty("contactsModel", &contactsModel);

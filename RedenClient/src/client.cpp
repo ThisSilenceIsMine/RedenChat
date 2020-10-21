@@ -1,7 +1,14 @@
 #include "../include/client.h"
 #include <QImage>
 #include <QBuffer>
-#include "globals.h"
+
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QFile>
+#include <QDir>
+
+#include "../include/globals.h"
 
 Client::Client(QObject *parent) : QObject(parent)
 {
@@ -89,7 +96,7 @@ void Client::sendDocument(QString url, QString reciver)
     Q_UNUSED(reciver)
 }
 
-void Client::loadMessageHistory(QString json)
+void Client::loadMessageHistory(QByteArray json)
 {
     Q_UNUSED(json)
 }
@@ -97,24 +104,37 @@ void Client::loadMessageHistory(QString json)
 void Client::addContact(QString contactData)
 {
     Contact item;
-
-    QString path = *Globals::imagesPath + QDir::separator() + item.nickname + "_avatar.png";
     QStringList data = contactData.split("$");
 
-    item.nickname = contactData.at(0);
+    item.nickname = data.first();
+    QString path = *Globals::imagesPath + QDir::separator() + item.nickname + "_avatar.png";
+    //QString path = QDir::currentPath() + "/images/" + item.nickname + "_avatar.png";
     item.imageUrl = path;
 
     QImage avatar;
     QByteArray imgRaw = QByteArray::fromBase64(data.last().toLocal8Bit());
-    QBuffer buff(&imgRaw);
 
-    avatar.load(&buff, "PNG");
-    avatar.save(path, "PNG");
+    QFile file(path);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qDebug() << Q_FUNC_INFO << "Can't create file";
+    }
+    if(!avatar.loadFromData(imgRaw))
+    {
+        qDebug() << Q_FUNC_INFO << " Can't load image from base64";
+    }
+    if(!avatar.save(&file, "PNG"))
+    {
+        qDebug() << Q_FUNC_INFO << " Can't save image to file";
+    }
+
+    file.close();
 
     model()->append(item);
+
 }
 
-void Client::newMessage(QString sender, QString text)
+void Client::newMessage(QString sender, QByteArray text)
 {
     Q_UNUSED(sender)
     Q_UNUSED(text)
@@ -123,8 +143,22 @@ void Client::newMessage(QString sender, QString text)
     //!!!!!!!!!!!!!!!!!!!!
 }
 
+void Client::newDocument(QString sender, QByteArray base64)
+{
+    Q_UNUSED(sender)
+    Q_UNUSED(base64)
+}
+
+void Client::newImage(QString sender, QByteArray base64)
+{
+    Q_UNUSED(sender)
+    Q_UNUSED(base64)
+}
+
 ContactsModel *Client::model() const
 {
+    if(!m_model)
+        qDebug() << "Model is not set! Pointer in client is empty";
     return m_model;
 }
 
@@ -135,10 +169,13 @@ void Client::setModel(ContactsModel *model)
 
 void Client::packageRecieved(net::Package package)
 {
-    QString data = package.data().toString();
+    QByteArray data = package.data().toByteArray();
 
     switch(package.type())
     {
+    case net::Package::CONTACTS_LIST:
+        loadContactsList(package.data().toJsonArray());
+        break;
     case net::Package::REGISTRATION_REQUEST:
         emit registerResponded(data.startsWith("S") );
         break;
@@ -161,5 +198,14 @@ void Client::packageRecieved(net::Package package)
     case net::Package::DOCUMENT:
         newDocument(package.sender(), data);
         break;
+    }
+}
+
+void Client::loadContactsList(QJsonArray json)
+{
+    foreach(QJsonValue contact, json)
+    {
+        qDebug() << Q_FUNC_INFO << "Invoking addContact";
+        addContact(contact.toString());
     }
 }
