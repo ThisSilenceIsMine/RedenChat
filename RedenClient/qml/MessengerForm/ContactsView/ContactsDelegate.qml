@@ -32,11 +32,14 @@ Rectangle
         RoundImage
         {
             id: avatar
-            source: avatarSource
+            source: "file:///" + avatarSource
             Layout.preferredWidth: 40
             Layout.preferredHeight: 40
             Layout.leftMargin: 5
             Layout.alignment: Qt.AlignLeft
+            Component.onCompleted: {
+                console.log("Avatar source = " + avatarSource)
+            }
         }
         Label
         {

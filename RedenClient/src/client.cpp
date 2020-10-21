@@ -83,7 +83,7 @@ void Client::sendImage(QString url, QString reciver)
     QBuffer buff(&imgRaw);
 
     image.save(&buff);
-    QString imageBase64 = imgRaw.toBase64();
+    QByteArray imageBase64 = imgRaw.toBase64();
     package.setData(imageBase64);
 
 
@@ -104,17 +104,21 @@ void Client::loadMessageHistory(QByteArray json)
 void Client::addContact(QString contactData)
 {
     Contact item;
-    QStringList data = contactData.split("$");
+    QStringList data = contactData.split(net::Package::delimiter());
 
     item.nickname = data.first();
-    QString path = *Globals::imagesPath + QDir::separator() + item.nickname + "_avatar.png";
-    //QString path = QDir::currentPath() + "/images/" + item.nickname + "_avatar.png";
+    //QString path = *Globals::imagesPath + QDir::separator() + item.nickname + "_avatar.png";
+    QString path = QDir::currentPath()
+                 //+ QDir::separator()
+                 + QLatin1String("/images/")
+                 //+ QDir::separator()
+                 + item.nickname + "_avatar.png";
     item.imageUrl = path;
 
     QImage avatar;
     QByteArray imgRaw = QByteArray::fromBase64(data.last().toLocal8Bit());
 
-    QFile file(path);
+    QFile file{path};
     if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
         qDebug() << Q_FUNC_INFO << "Can't create file";
