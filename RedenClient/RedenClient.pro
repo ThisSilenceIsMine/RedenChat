@@ -11,6 +11,8 @@ SOURCES += \
         src/client.cpp \
         src/contactslist.cpp \
         src/contactsmodel.cpp \
+        src/messageslist.cpp \
+        src/messagesmodel.cpp \
         src/userdata.cpp
 
 RESOURCES += qml.qrc
@@ -42,4 +44,6 @@ HEADERS += \
     include/contactslist.h \
     include/contactsmodel.h \
     include/globals.h \
+    include/messageslist.h \
+    include/messagesmodel.h \
     include/userdata.h

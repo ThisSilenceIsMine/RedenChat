@@ -4,15 +4,18 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 
+import reden.models.contactsModel 1.0
+
 ListView
 {
     id: list
     focus: true
     clip: true
+    model: contactsModel
     highlightFollowsCurrentItem: false
     spacing: 10
     highlight: delegateHighlight
-
+    signal selectedChanged(int idx)
     Component
     {
         id: delegateHighlight
@@ -57,9 +60,14 @@ ListView
         onClick: {
             list.currentIndex = index
             console.log("selected delegate #" + index)
+            selectedChanged(index)
         }
     }
-    Component.onCompleted: console.log("idx = " + list.currentIndex)
+    Component.onCompleted:
+    {
+        selectedChanged.connect(contactsModel.indexChanged)
+    }
+
     //onCurrentItemChanged: console.log(model.get(list.currentIndex).nickname + ' selected')
 
 }

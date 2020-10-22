@@ -15,7 +15,8 @@
 #include <QJsonObject>
 
 #include "include/client.h"
-
+#include "include/contactslist.h"
+#include "include/contactsmodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     ContactsModel contactsModel;
     contactsModel.setList(&list);
 
-    client.setModel(&contactsModel);
+    client.setContactsModel(&contactsModel);
 //    Contact item;
 //    item.nickname = "some nickename";
 //    item.imageUrl = "qrc:/images/Default.png";

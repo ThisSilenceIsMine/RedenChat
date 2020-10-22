@@ -47,83 +47,15 @@ Rectangle
                 font.pointSize: 32
                 //Layout.topMargin: 10
             }
-            ListModel
-            {
-                id: sampleContactsModel
-
-                ListElement
-                {
-                    // @disable-check M16
-                    nickname: "Vasya"
-
-                    // @disable-check M16
-                    avatar: "qrc:/qml/Images/Default"
-
-                }
-                ListElement
-                {
-                    // @disable-check M16
-                    nickname: "Anton"
-
-                    // @disable-check M16
-                    avatar: "qrc:/qml/Images/Default"
-                }
-                ListElement
-                {
-                    // @disable-check M16
-                    nickname: "$a$h@"
-
-                    // @disable-check M16
-                    avatar: "qrc:/qml/Images/Default"
-                }
-                ListElement
-                {
-                    // @disable-check M16
-                    nickname: "Alex"
-
-                    // @disable-check M16
-                    avatar: "qrc:/qml/Images/Default"
-                }
-                ListElement
-                {
-                    // @disable-check M16
-                    nickname: "Ivan"
-
-                    // @disable-check M16
-                    avatar: "qrc:/qml/Images/Default"
-                }
-                ListElement
-                {
-                    // @disable-check M16
-                    nickname: "SuperCatGirlLover1337"
-
-                    // @disable-check M16
-                    avatar: "qrc:/qml/Images/Default"
-                }
-                ListElement
-                {
-                    // @disable-check M16
-                    nickname: "Some decnly long nickname"
-
-                    // @disable-check M16
-                    avatar: "qrc:/qml/Images/Default"
-                }
-            }
 
             ContactsView
             {
                 id: contactsView
-                model: contactsModel
+                //model: contactsModel
                 anchors.fill: parent
                 anchors.top: logo_text.bottom
                 anchors.topMargin: logo_text.height
-                Component.onCompleted:
-                {
-//                    for(var i = 0; i < 20; ++i)
-//                    {
-//                        sampleContactsModel.append({"nickname":"Some decent nickname", "avatar":"qrc:/qml/Images/Default"})
-//                    }
-                }
+
             }
 
         }

@@ -1,27 +1,25 @@
-#ifndef CONTACTSMODEL_H
-#define CONTACTSMODEL_H
+#ifndef MESSAGESMODEL_H
+#define MESSAGESMODEL_H
 
 #include <QAbstractListModel>
 #include <QObject>
-#include <QList>
 
-#include "contactslist.h"
+#include "messageslist.h"
 
-class ContactsModel : public QAbstractListModel
+class MessagesModel : public QAbstractListModel
 {
     Q_OBJECT
-//    Q_PROPERTY(ContactsList m_list READ list)
 public:
     enum Roles
     {
-        NicknameRole = Qt::UserRole + 1,
-        ImageRole
+        SenderRole = Qt::UserRole + 1,
+        TextRole
     };
-    ContactsModel(QObject *parent = nullptr);
-    ContactsList *list() const;
-    void setList(ContactsList *list);
+    MessagesModel(QObject *parent = nullptr);
+    MessagesList *list() const;
+    void setList(MessagesList *list);
 
-    void append(const Contact &item);
+    void append(const Message &item);
     // QAbstractItemModel interface
 public:
     int rowCount(const QModelIndex &parent) const override;
@@ -30,12 +28,9 @@ public:
     bool insertRows(int row, int count, const QModelIndex &parent) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QHash<int, QByteArray> roleNames() const override;
-public slots:
-    void indexChanged(int idx);
-signals:
-    void selectedChanged(int idx);
+
 private:
-    ContactsList *m_list;
+    MessagesList *m_list;
 };
 
-#endif // CONTACTSMODEL_H
+#endif // MESSAGESMODEL_H

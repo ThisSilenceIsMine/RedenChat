@@ -130,6 +130,10 @@ void Client::getMessageHistory(int idx)
 
 void Client::loadMessageHistory(QJsonArray json)
 {
+    if(!m_messagesModel)
+    {
+        return;
+    }
     foreach(QJsonValue val, json)
     {
         QStringList data = val.toString().split(net::Package::delimiter());

@@ -1,23 +1,17 @@
-#include "../include/contactsmodel.h"
+#include "../include/messagesmodel.h"
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
 
-void ContactsModel::indexChanged(int idx)
-{
-    qDebug() << Q_FUNC_INFO << "selected index = " << idx;
-    emit selectedChanged(idx);
-}
-
-ContactsModel::ContactsModel(QObject *parent)
-    : QAbstractListModel(parent)
-    , m_list(nullptr)
+MessagesModel::MessagesModel(QObject *parent)
+    : QAbstractListModel(parent),
+      m_list(nullptr)
 {
 
 }
 
-int ContactsModel::rowCount(const QModelIndex &parent) const
+int MessagesModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid() || !m_list)
         return 0;
@@ -25,42 +19,42 @@ int ContactsModel::rowCount(const QModelIndex &parent) const
     return m_list->items().size();
 }
 
-QVariant ContactsModel::data(const QModelIndex &index, int role) const
+QVariant MessagesModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid() || !m_list)
         return QVariant();
 
     qDebug() << "Getting data at: " << index.row() << " with role " << role;
-    const Contact &item = m_list->items().at(index.row());
+    const Message &item = m_list->items().at(index.row());
 
     switch (role) {
-    case NicknameRole:
-        return QVariant(item.nickname);
+    case SenderRole:
+        return QVariant(item.sender);
 
-    case ImageRole:
-        return QVariant(item.imageUrl);
+    case TextRole:
+        return QVariant(item.text);
     }
 
 
     return QVariant();
 }
 
-bool ContactsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool MessagesModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if(!index.isValid() || !m_list)
     {
         qDebug() << "setData error: invalid index";
         return false;
     }
-    Contact item = m_list->items().at(index.row());
+    Message item = m_list->items().at(index.row());
 
     switch (role) {
-    case NicknameRole:
-        item.nickname = value.toString();
+    case SenderRole:
+        item.sender = value.toString();
         break;
 
-    case ImageRole:
-        item.imageUrl = value.toString();
+    case TextRole:
+        item.text = value.toString();
         break;
     }
 
@@ -73,7 +67,7 @@ bool ContactsModel::setData(const QModelIndex &index, const QVariant &value, int
     return false;
 }
 
-bool ContactsModel::insertRows(int row, int count, const QModelIndex &parent)
+bool MessagesModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(parent)
     if(!m_list)
@@ -84,7 +78,7 @@ bool ContactsModel::insertRows(int row, int count, const QModelIndex &parent)
     for(int i = 0; i < count; ++i)
     {
         qDebug() << "insertRows: invoked inner insert";
-        m_list->items().insert(row,Contact{});
+        m_list->items().insert(row,Message{});
     }
     qDebug() << "insertRows: row count: " << m_list->items().size();
 
@@ -92,7 +86,7 @@ bool ContactsModel::insertRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-Qt::ItemFlags ContactsModel::flags(const QModelIndex &index) const
+Qt::ItemFlags MessagesModel::flags(const QModelIndex &index) const
 {
     if(!index.isValid())
         return Qt::NoItemFlags;
@@ -100,21 +94,23 @@ Qt::ItemFlags ContactsModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEnabled | Qt::ItemIsEditable;
 }
 
-QHash<int, QByteArray> ContactsModel::roleNames() const
+QHash<int, QByteArray> MessagesModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[NicknameRole] = "nickname";
-    roles[ImageRole] = "avatar";
+    roles[SenderRole] = "nickname";
+    roles[TextRole] = "avatar";
 
     return roles;
 }
 
-ContactsList *ContactsModel::list() const
+
+
+MessagesList *MessagesModel::list() const
 {
     return m_list;
 }
 
-void ContactsModel::setList(ContactsList *list)
+void MessagesModel::setList(MessagesList *list)
 {
     emit beginResetModel();
     if(m_list)
@@ -123,25 +119,25 @@ void ContactsModel::setList(ContactsList *list)
     m_list = list;
     if(m_list)
     {
-        connect(m_list, &ContactsList::preItemAppended, this, [=](){
+        connect(m_list, &MessagesList::preItemAppended, this, [=](){
             const int index = m_list->items().size();
             beginInsertRows(QModelIndex(),index,index);
         });
-        connect(m_list, &ContactsList::postItemAppended, this, [=](){
+        connect(m_list, &MessagesList::postItemAppended, this, [=](){
             endInsertRows();
         });
 
-        connect(m_list, &ContactsList::preItemRemoved, this, [=](int index){
+        connect(m_list, &MessagesList::preItemRemoved, this, [=](int index){
             beginRemoveRows(QModelIndex(),index,index);
         });
-        connect(m_list, &ContactsList::postItemRemoved, this, [=](){
+        connect(m_list, &MessagesList::postItemRemoved, this, [=](){
             endRemoveRows();
         });
     }
     endResetModel();
 }
 
-void ContactsModel::append(const Contact &item)
+void MessagesModel::append(const Message &item)
 {
     if(insertRows(this->rowCount({}),1,{}))
         qDebug() << "Appending at " << this->rowCount({});
@@ -152,12 +148,10 @@ void ContactsModel::append(const Contact &item)
     }
     bool ok = 0;
 
-    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.nickname), Roles::NicknameRole);
-    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.imageUrl), Roles::ImageRole);
+    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.sender), Roles::SenderRole);
+    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.text), Roles::TextRole);
 
     if(!ok)
         qDebug() << "Set data not working!";
 
 }
-
-

@@ -105,6 +105,11 @@ void Connection::stateChanged(QAbstractSocket::SocketState socketState)
 
 void Connection::sendPackage(Package package)
 {
+    if(!m_socket.isOpen())
+    {
+        qDebug() << Q_FUNC_INFO << "Not connected";
+        return;
+    }
     QByteArray block;
     QByteArray rawData = m_serializer->toBytes(package);
     QDataStream out(&block, QIODevice::WriteOnly);
