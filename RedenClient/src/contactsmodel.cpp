@@ -8,6 +8,17 @@ void ContactsModel::indexChanged(int idx)
 {
     qDebug() << Q_FUNC_INFO << "selected index = " << idx;
     emit selectedChanged(idx);
+    m_currentIndex = idx;
+}
+
+int ContactsModel::currentIndex() const
+{
+    return m_currentIndex;
+}
+
+QString ContactsModel::currentDialog() const
+{
+    return data(this->index(currentIndex()),Roles::NicknameRole).toString();
 }
 
 ContactsModel::ContactsModel(QObject *parent)

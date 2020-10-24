@@ -13,7 +13,8 @@ public:
     enum Roles
     {
         SenderRole = Qt::UserRole + 1,
-        TextRole
+        TextRole,
+        TimeRole
     };
     MessagesModel(QObject *parent = nullptr);
     MessagesList *list() const;
@@ -28,7 +29,7 @@ public:
     bool insertRows(int row, int count, const QModelIndex &parent) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QHash<int, QByteArray> roleNames() const override;
-
+    void reset();
 private:
     MessagesList *m_list;
 };

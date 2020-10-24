@@ -9,6 +9,7 @@ import MessengerForm.MessagesView 1.0
 import MessengerForm.ContactsView 1.0
 
 import reden.models.contactsModel 1.0
+import reden.models.messagesModel 1.0
 
 Rectangle
 {
@@ -111,7 +112,7 @@ Rectangle
                 anchors.bottomMargin: messageInput.height + 75
                 anchors.leftMargin: 5
                 anchors.rightMargin: 5
-                model: sampleMessageModel
+                model: messagesModel//sampleMessageModel
                 spacing: 75
                 verticalLayoutDirection: ListView.BottomToTop
                 delegate: MessagesDelegate
@@ -120,7 +121,7 @@ Rectangle
                     time: model.timeStamp
                     username: model.nickname
                     message: model.text
-                    avatarSource: model.avatar
+                    avatarSource: "qrc:/qml/Images/Default"//model.avatar
                 }
 
             }

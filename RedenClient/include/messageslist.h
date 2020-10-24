@@ -5,7 +5,8 @@
 struct Message
 {
     QString sender;
-    QString text;
+    QString data;
+    QString timeStamp;
 };
 
 class MessagesList : public QObject

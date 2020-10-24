@@ -32,7 +32,10 @@ QVariant MessagesModel::data(const QModelIndex &index, int role) const
         return QVariant(item.sender);
 
     case TextRole:
-        return QVariant(item.text);
+        return QVariant(item.data);
+
+    case TimeRole:
+        return QVariant(item.timeStamp);
     }
 
 
@@ -54,8 +57,10 @@ bool MessagesModel::setData(const QModelIndex &index, const QVariant &value, int
         break;
 
     case TextRole:
-        item.text = value.toString();
+        item.data = value.toString();
         break;
+    case TimeRole:
+        item.timeStamp = value.toString();
     }
 
     if(m_list->setItemAt(index.row(), item))
@@ -98,12 +103,21 @@ QHash<int, QByteArray> MessagesModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[SenderRole] = "nickname";
-    roles[TextRole] = "avatar";
+    roles[TextRole] = "text";
+    roles[TimeRole] = "timeStamp";
 
     return roles;
 }
 
+void MessagesModel::reset()
+{
+    emit beginResetModel();
 
+    m_list->items().clear();
+    QAbstractListModel::resetInternalData();
+
+    emit endResetModel();
+}
 
 MessagesList *MessagesModel::list() const
 {
@@ -139,7 +153,7 @@ void MessagesModel::setList(MessagesList *list)
 
 void MessagesModel::append(const Message &item)
 {
-    if(insertRows(this->rowCount({}),1,{}))
+    if(insertRows(0,1,{}))
         qDebug() << "Appending at " << this->rowCount({});
 
     if(this->rowCount({}) == 0)
@@ -148,10 +162,14 @@ void MessagesModel::append(const Message &item)
     }
     bool ok = 0;
 
-    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.sender), Roles::SenderRole);
-    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.text), Roles::TextRole);
+//    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.sender), Roles::SenderRole);
+//    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.data), Roles::TextRole);
+//    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.timeStamp), Roles::TimeRole);
+
+    ok |= setData(this->index(0), QVariant(item.sender), Roles::SenderRole);
+    ok |= setData(this->index(0), QVariant(item.data), Roles::TextRole);
+    ok |= setData(this->index(0), QVariant(item.timeStamp), Roles::TimeRole);
 
     if(!ok)
         qDebug() << "Set data not working!";
-
 }

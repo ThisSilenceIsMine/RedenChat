@@ -12,11 +12,12 @@
 #include "include/RedenNetworkLib_global.h"
 #include "include/connection.h"
 #include "include/package.h"
-
+//#include "userdata.h"
 //#include "contactsmodel.h"
 
 class MessagesModel;
 class ContactsModel;
+class UserData;
 
 class Client : public QObject
 {
@@ -24,12 +25,14 @@ class Client : public QObject
 public:
     explicit Client(QObject *parent = nullptr);
 
-
     ContactsModel *contactsModel() const;
     void setContactsModel(ContactsModel *contactsModel);
 
     MessagesModel *messagesModel() const;
     void setMessagesModel(MessagesModel *messagesModel);
+
+    UserData *getUser() const;
+    void setUser(UserData *user);
 
 public slots:
     void registerNewUser(QString username, QString password, QString imgUrl);
@@ -49,18 +52,24 @@ public slots:
 private slots:
     void packageRecieved(net::Package package);
 signals:
+    void qmlAuthorize(QString name, QString password);
+    void qmlRegister(QString name, QString password, QString imageUrl);
+
+
     void registerResponded(bool status);
     void authResponded(bool status);
 private:
 
     void addContact(QString contactData);
-    void newMessage(QString sender, QByteArray text);
+    void addMessage(QString);
+    void newMessage(QString sender, QString time,QString text);
+    void newMessage(QString raw);
     void newDocument(QString sender, QByteArray base64);
     void newImage(QString sender, QByteArray base64);
 
 private:
+    UserData *m_user;
     net::Connection m_connection;
-    QString m_username;
     ContactsModel *m_contactsModel;
     MessagesModel *m_messagesModel;
 

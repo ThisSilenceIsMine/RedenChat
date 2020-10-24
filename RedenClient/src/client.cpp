@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QDir>
+#include <QTime>
 
 #include "../include/globals.h"
 
@@ -16,7 +17,13 @@
 #include "../include/messageslist.h"
 #include "../include/messagesmodel.h"
 
-Client::Client(QObject *parent) : QObject(parent)
+#include "../include/userdata.h"
+
+Client::Client(QObject *parent) : QObject(parent),
+    m_user{nullptr},
+    m_contactsModel{nullptr},
+    m_messagesModel{nullptr}
+
 {
     connect(&m_connection, &net::Connection::newPackage, this, &Client::packageRecieved);
 
@@ -27,7 +34,7 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     net::Package package;
     QString delim = net::Package::delimiter();
     package.setType(net::Package::DataType::REGISTRATION_REQUEST);
-    package.setSender(m_username);
+    package.setSender(m_user->username());
     package.setDestinations({});
 
     QImage avatar;
@@ -52,7 +59,7 @@ void Client::authorize(QString username, QString password)
     QString delim = net::Package::delimiter();
 
     package.setType(net::Package::DataType::AUTH_REQUEST);
-    package.setSender(m_username);
+    package.setSender(m_user->username());
     package.setDestinations({});
 
     package.setData(username + delim +
@@ -65,13 +72,14 @@ void Client::sendMessage(QString text, QString to)
 {
     net::Package package;
     QString delim = net::Package::delimiter();
-
+    QString currentTime = QTime::currentTime().toString();
     package.setType(net::Package::DataType::TEXT_MESSAGE);
-    package.setSender(m_username);
+    package.setSender(m_user->username());
     package.setDestinations({to});
-    package.setData(text);
+    package.setData(currentTime + delim + text);
 
     m_connection.sendPackage(package);
+    m_messagesModel->append(Message{m_user->username(), text, currentTime});
 }
 
 void Client::sendImage(QString url, QString reciver)
@@ -81,7 +89,7 @@ void Client::sendImage(QString url, QString reciver)
     QString delim = net::Package::delimiter();
 
     package.setType(net::Package::DataType::IMAGE);
-    package.setSender(m_username);
+    package.setSender(m_user->username());
     package.setDestinations({reciver});
 
     QImage image;
@@ -106,7 +114,7 @@ void Client::sendDocument(QString url, QString reciver)
 void Client::getContactsList()
 {
     net::Package package;
-    package.setSender(m_username);
+    package.setSender(m_user->username());
     package.setDestinations({});
     package.setType(net::Package::DataType::CONTACTS_LIST);
     package.setData({}); //Don't need any data here. Placeholder for furher rework
@@ -116,27 +124,28 @@ void Client::getContactsList()
 
 void Client::getMessageHistory(int idx)
 {
-    QString user = m_contactsModel->data(m_contactsModel->index(idx), ContactsModel::Roles::NicknameRole).toString();
-    qDebug() << Q_FUNC_INFO << "getting history woth user: " << user;
+    Q_UNUSED(idx)
+    QString user = m_contactsModel->currentDialog();
     net::Package package;
-    package.setSender(m_username);
+    package.setSender(m_user->username());
     package.setDestinations({user});
     package.setType(net::Package::DataType::MESSAGE_HISTORY);
     package.setData({});
 
     m_connection.sendPackage(package);
-
 }
 
 void Client::loadMessageHistory(QJsonArray json)
 {
+
+    if(!m_messagesModel)
+    {
+        return;
+    }
+    m_messagesModel->reset();
     foreach(QJsonValue val, json)
     {
-        QStringList data = val.toString().split(net::Package::delimiter());
-        Message item;
-        item.sender = data.first();
-        item.text = data.last();
-        m_messagesModel->append(item);
+        newMessage(val.toString());
     }
 }
 
@@ -148,10 +157,10 @@ void Client::addContact(QString contactData)
     item.nickname = data.first();
     //QString path = *Globals::imagesPath + QDir::separator() + item.nickname + "_avatar.png";
     QString path = QDir::currentPath()
-                 //+ QDir::separator()
-                 + QLatin1String("/images/")
-                 //+ QDir::separator()
-                 + item.nickname + "_avatar.png";
+            //+ QDir::separator()
+            + QLatin1String("/images/")
+            //+ QDir::separator()
+            + item.nickname + "_avatar.png";
     item.imageUrl = path;
 
     QImage avatar;
@@ -176,11 +185,34 @@ void Client::addContact(QString contactData)
     contactsModel()->append(item);
 }
 
-void Client::newMessage(QString sender, QByteArray text)
+void Client::newMessage(QString sender, QString time, QString text)
 {
-    Message item;
-    item.sender = sender;
-    item.text = text;
+    //if(sender == m_contactsModel->currentDialog() || sender == m_user->username())
+    if(sender == QLatin1String("Dias") || sender == m_user->username())
+    {
+        Message item;
+        QStringList data = text.split(net::Package::delimiter());
+        item.sender = sender;
+        item.data = text;
+        item.timeStamp = time;
+        m_messagesModel->append(item);
+    }
+    else
+    {
+        //Уведомить о новом сообщении из другого диалога
+    }
+
+}
+
+void Client::newMessage(QString raw)
+{
+    //"nickname$time$text$
+    QStringList data = raw.split(net::Package::delimiter());
+    QString sender = data.at(0);
+    QString time = data.at(1);
+    QString text = data.at(2);
+
+    newMessage(sender,time,text);
 }
 
 void Client::newDocument(QString sender, QByteArray base64)
@@ -195,6 +227,16 @@ void Client::newImage(QString sender, QByteArray base64)
     Q_UNUSED(base64)
 }
 
+UserData *Client::getUser() const
+{
+    return m_user;
+}
+
+void Client::setUser(UserData *user)
+{
+    m_user = user;
+}
+
 MessagesModel *Client::messagesModel() const
 {
     return m_messagesModel;
@@ -202,6 +244,8 @@ MessagesModel *Client::messagesModel() const
 
 void Client::setMessagesModel(MessagesModel *messagesModel)
 {
+    if(m_messagesModel)
+        m_messagesModel->disconnect(this);
     m_messagesModel = messagesModel;
 }
 
@@ -212,10 +256,9 @@ ContactsModel *Client::contactsModel() const
 
 void Client::setContactsModel(ContactsModel *contactsModel)
 {
-//    if(m_contactsModel)
-//    {
-//        disconnect(m_contactsModel, &ContactsModel::indexChanged, this, &Client::getMessageHistory);
-//    }
+    if(m_contactsModel)
+        m_contactsModel->disconnect(this);
+
     m_contactsModel = contactsModel;
     connect(m_contactsModel, &ContactsModel::selectedChanged, this, &Client::getMessageHistory);
 }
@@ -244,7 +287,7 @@ void Client::packageRecieved(net::Package package)
         addContact(data);
         break;
     case net::Package::TEXT_MESSAGE:
-        newMessage(package.sender(), data);
+        newMessage(package.sender() + net::Package::delimiter() + data);
         break;
     case net::Package::IMAGE:
         newImage(package.sender(), data);

@@ -17,6 +17,9 @@
 #include "include/client.h"
 #include "include/contactslist.h"
 #include "include/contactsmodel.h"
+#include "include/messageslist.h"
+#include "include/messagesmodel.h"
+#include "include/userdata.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,39 +34,55 @@ int main(int argc, char *argv[])
     app.setFont(QFont(QStringLiteral("OpenSansEmoji")));
 
 
-    ContactsList list;
+    ContactsList contactsList;
     ContactsModel contactsModel;
-    contactsModel.setList(&list);
-
+    contactsModel.setList(&contactsList);
     client.setContactsModel(&contactsModel);
-//    Contact item;
-//    item.nickname = "some nickename";
-//    item.imageUrl = "qrc:/images/Default.png";
-//    for(int i = 0; i < 5; ++i)
-//    {
-//        contactsModel.append(item);
-//    }
+
+    MessagesList messagesList;
+    MessagesModel messagesModel;
+    messagesModel.setList(&messagesList);
+    client.setMessagesModel(&messagesModel);
+
+    UserData user;
+    user.setUsername("Raiden");
+    client.setUser(&user);
+
 
     QString fileUrl = QDir::currentPath() + "/Contacts.json";
     QFile file(fileUrl);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qDebug() << "File opened!";
+
         QJsonDocument js = QJsonDocument::fromJson(file.readAll());
-        qDebug() << "Document parsed!";
+
         file.close();
         QJsonArray arr = js["data"].toVariant().toJsonArray();
-        qDebug() << "Invoking loadContactsList...";
+
         client.loadContactsList(arr);
-        qDebug() << "File closed!";
+
     }
 
+    QString msgUrl = QDir::currentPath() + "/Messages.json";
+    QFile msgFile(msgUrl);
+    if(msgFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QJsonDocument js = QJsonDocument::fromJson(msgFile.readAll());
+
+        msgFile.close();
+        QJsonArray arr = js["data"].toVariant().toJsonArray();
+        client.loadMessageHistory(arr);
+    }
     QQmlApplicationEngine engine;
 
     //qmlRegisterUncreatableType<ContactsList>("reden.models.contactsList",1,0,"ContactsList",QStringLiteral("ContactsList cannot be created in QML"));
     qmlRegisterType<ContactsModel>("reden.models.contactsModel",1,0,"ContactsModel");
+    qmlRegisterType<MessagesModel>("reden.models.messagesModel",1,0,"MessagesModel");
+    qmlRegisterType<Client>("reden.net.client",1,0,"Client");
 
     engine.rootContext()->setContextProperty("contactsModel", &contactsModel);
+    engine.rootContext()->setContextProperty("messagesModel", &messagesModel);
+    engine.rootContext()->setContextProperty("client", &client);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     engine.addImportPath(":/qml");
