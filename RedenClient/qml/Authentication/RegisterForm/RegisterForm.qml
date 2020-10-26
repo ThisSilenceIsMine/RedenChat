@@ -4,6 +4,7 @@ import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
+import QtQuick.Dialogs 1.2
 import ErrorString 1.0
 Rectangle
 {
@@ -12,7 +13,6 @@ Rectangle
     implicitHeight: GlobalSettings.defaultFormHeight
     visible: true
     FontLoader { id: starsetFont; source: "../../fonts/jaapokkisubtract-regular.ttf" }
-    signal registerNew(string login, string pw, string nickname)
     signal back()
 
     Rectangle
@@ -58,28 +58,6 @@ Rectangle
         width: parent.width / 2 + parent.width / 4
         spacing: 1
 
-        TextField
-        {
-            id: inputLogin
-            property var accent: Material.color(Material.Teal)
-            Layout.minimumHeight: 40
-            Layout.minimumWidth: 150
-            Layout.alignment: Qt.AlignHCenter
-            width: 150
-            Material.accent: accent
-            placeholderText: qsTr("Логин")
-            ErrorString
-            {
-                id: loginErrorString
-                anchors.top: inputLogin.bottom
-                visible: false
-                text: qsTr("Логин обязателен")
-            }
-            onTextChanged: {
-                loginErrorString.visible = false
-                inputLogin.accent = Material.color(Material.Teal)
-            }
-        }
         TextField
         {
             id: inputNickname
@@ -179,7 +157,52 @@ Rectangle
                 confirmPassword.accent = Material.color(Material.Teal)
             }
         }
-
+        Button
+        {
+            id: chooseAvatar
+            property string imageUrl
+            Layout.alignment: Qt.AlignHCenter
+            text: qsTr("Выберите изображение профиля")
+            flat: true
+            contentItem: Text {
+                text: parent.text
+                font: parent.font
+                opacity: enabled ? 1.0 : 0.3
+                color: parent.down ? "#FA8072" : "#FFFFFF"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+            FileDialog
+            {
+                id: chooseAvatarDialog
+                title: qsTr("Выберите файл")
+                folder: shortcuts.home
+                selectMultiple: false
+                selectFolder: false
+                nameFilters: [ "Image files (*.png)" ]
+                onAccepted: {
+                    console.log("You chose: " + chooseAvatarDialog.fileUrl)
+                    chooseAvatar.imageUrl = chooseAvatarDialog.fileUrl
+                    chooseAvatarDialog.close()
+                }
+                onRejected:
+                {
+                    chooseAvatarDialog.close()
+                }
+            }
+            onClicked: {
+                chooseAvatarDialog.visible = true
+            }
+        }
+        ErrorString
+        {
+            id: registerErrorString
+            visible: false
+            text: qsTr("Ошибка Регистрации.\nВероятно, данный никнейм уже зарегестрирован")
+            anchors.bottom: confirmRegistration.top
+            anchors.bottomMargin: 30
+        }
         Button
         {
             id: confirmRegistration
@@ -208,17 +231,15 @@ Rectangle
                     return true;
                 }
 
-                var check_rezult = checkField(inputLogin, loginErrorString)
-                        & checkField(inputPassword, pwErrorString)
+                var check_rezult = checkField(inputPassword, pwErrorString)
                         & checkField(confirmPassword, pwcErrorString)
                         & checkField(inputNickname, nicknameErrorString);
                 return check_rezult;
             }
 
             onClicked: {
-                if(checkFields() && pwcErrorString.checkConditions()) //Если true - пытаемся зарегать
-                    //Ну типа регаем
-                    registerNew(inputLogin.text, inputPassword.text, inputNickname.text)
+                if(checkFields() && pwcErrorString.checkConditions())
+                    client.registerNewUser(inputNickname.text, inputPassword.text, chooseAvatar.imageUrl)
             }
         }
         Button
@@ -237,8 +258,17 @@ Rectangle
             }
 
             onClicked: {
-                    back()
+                back()
             }
+        }
+    }
+    Connections{
+        target: client
+        function onRegisterSuccess() {
+            back()
+        }
+        function onRegisterFailure() {
+            registerErrorString.visible = true
         }
     }
 }

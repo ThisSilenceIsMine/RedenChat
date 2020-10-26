@@ -32,17 +32,32 @@ Client::Client(QObject *parent) : QObject(parent),
 void Client::registerNewUser(QString username, QString password, QString imgUrl)
 {
     net::Package package;
+    QString fixedUrl = imgUrl.remove(0,8); // Удаляем "file:///" с начала пути
+    m_user->setUsername(username);
+    m_user->setImageUrl(fixedUrl);
+
     QString delim = net::Package::delimiter();
     package.setType(net::Package::DataType::REGISTRATION_REQUEST);
     package.setSender(m_user->username());
     package.setDestinations({});
+    bool ok = false;
 
     QImage avatar;
-    avatar.load(imgUrl);
+    ok = avatar.load(fixedUrl);
+    if(!ok)
+    {
+        qDebug() << Q_FUNC_INFO << "Can't load image from " << fixedUrl;
+    }
     QByteArray imgRaw;
     QBuffer buff(&imgRaw);
+
+
     buff.open(QIODevice::WriteOnly | QIODevice::Truncate);
-    avatar.save(&buff);
+    ok = avatar.save(&buff, "PNG");
+    if(!ok)
+    {
+        qDebug() << "Can't save image to buffer";
+    }
     buff.close();
     QString avatarBase64 = imgRaw.toBase64();
 
@@ -50,6 +65,8 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
                     password + delim +
                     avatarBase64);
 
+
+    qDebug() << Q_FUNC_INFO << username << password << fixedUrl;
     m_connection.sendPackage(package);
 }
 
@@ -230,6 +247,36 @@ void Client::newImage(QString sender, QByteArray base64)
     Q_UNUSED(base64)
 }
 
+void Client::authorize(QString username, QByteArray base64)
+{
+
+    QString path = QDir::currentPath()
+            //+ QDir::separator()
+            + QLatin1String("/images/")
+            //+ QDir::separator()
+            + username + "_avatar.png";
+
+    QImage avatar;
+
+    QFile file{path};
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qDebug() << Q_FUNC_INFO << "Can't create file";
+    }
+    if(!avatar.loadFromData(base64))
+    {
+        qDebug() << Q_FUNC_INFO << " Can't load image from base64";
+    }
+    if(!avatar.save(&file, "PNG"))
+    {
+        qDebug() << Q_FUNC_INFO << " Can't save image to file";
+    }
+
+    file.close();
+    m_user->setUsername(username);
+    m_user->setImageUrl(path);
+}
+
 UserData *Client::getUser() const
 {
     return m_user;
@@ -273,24 +320,33 @@ void Client::packageRecieved(net::Package package)
 
     switch(package.type())
     {
-    case net::Package::CONTACTS_LIST:
+    case net::Package::CONTACTS_LIST: //Спислк контактов. Получаем сразе после входа в аккаунт
         loadContactsList(package.data().toJsonArray());
         break;
     case net::Package::REGISTRATION_REQUEST:
-        emit registerResponded(data.startsWith("S") );
+        if(data.startsWith("S"))
+            emit registerSuccess();
+        else
+            emit registerFailure();
         break;
 
-    case net::Package::AUTH_REQUEST:
-        emit authResponded( data.startsWith("S") );
+    case net::Package::AUTH_REQUEST: //Ответ на авторизацию Данные пустые = фейл
+        if(!data.isEmpty())
+        {
+            authorize(package.sender(), data);
+            emit authSuccsess();
+        }
+        else
+            emit authFailure();
         break;
-    case net::Package::MESSAGE_HISTORY:
+    case net::Package::MESSAGE_HISTORY: //Переписка с контактом. Загружем при переключении на другой диалог
         loadMessageHistory(package.data().toJsonArray());
         break;
-    case net::Package::USER_DATA:
+    case net::Package::USER_DATA: //Добавляем 1 контакт
         addContact(data);
         break;
-    case net::Package::TEXT_MESSAGE:
-        newMessage(package.sender() + net::Package::delimiter() + data);
+    case net::Package::TEXT_MESSAGE: //Текстовое сообщение
+        newMessage(package.sender() + net::Package::delimiter() + data); //никнейм$время$текст
         break;
     case net::Package::IMAGE:
         newImage(package.sender(), data);

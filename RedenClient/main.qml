@@ -3,6 +3,8 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
+import QtQuick.Dialogs 1.2
+
 import GlobalQmlSettings 1.0
 import Authentication.LoginForm 1.0
 import Authentication.RegisterForm 1.0
@@ -44,9 +46,6 @@ ApplicationWindow {
             RegisterForm
             {
                 id: registerForm
-                onRegisterNew: {
-                    stackView.pop()
-                }
                 onBack: {
                     stackView.pop()
                 }
@@ -61,15 +60,23 @@ ApplicationWindow {
                 onGotoRegister: {
                     stackView.push(registerFormStackComponent)
                 }
-                onAuth: {
-                    if(stackView.depth > 1)
-                        stackView.pop()
-                    stackView.push(mainFormStackComponent)
+                //                onAuth: {
+                //                    if(stackView.depth > 1)
+                //                        stackView.pop()
+                //                    stackView.push(mainFormStackComponent)
+                //                }
+                Connections{
+                    target: client
+                    function onAuthSuccsess()
+                    {
+                        if(stackView.depth > 1)
+                            stackView.pop()
+                        stackView.push(mainFormStackComponent)
+                    }
                 }
             }
         }
     }
-
 
 }
 

@@ -42,7 +42,6 @@ public slots:
     void sendImage(QString url, QString reciver);
     void sendDocument(QString url, QString reciver);
 
-
     void getContactsList();
     void getMessageHistory(int idx);
 
@@ -52,14 +51,12 @@ public slots:
 private slots:
     void packageRecieved(net::Package package);
 signals:
-    void qmlAuthorize(QString name, QString password);
-    void qmlRegister(QString name, QString password, QString imageUrl);
+    void registerSuccess();
+    void registerFailure();
 
-
-    void registerResponded(bool status);
-    void authResponded(bool status);
+    void authSuccsess();
+    void authFailure();
 private:
-
     void addContact(QString contactData);
     void addMessage(QString);
     void newMessage(QString sender, QString time,QString text);
@@ -67,6 +64,7 @@ private:
     void newDocument(QString sender, QByteArray base64);
     void newImage(QString sender, QByteArray base64);
 
+    void authorize(QString username, QByteArray base64);
 private:
     UserData *m_user;
     net::Connection m_connection;

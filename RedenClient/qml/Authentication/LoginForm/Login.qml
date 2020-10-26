@@ -68,7 +68,6 @@ Rectangle
             Layout.minimumWidth: 150
             Layout.fillHeight: false
             Layout.fillWidth: false
-            //            anchors.horizontalCenter: parent.horizontalCenter
             Layout.alignment: Qt.AlignHCenter
             Material.accent: accent
             width: 150
@@ -79,8 +78,6 @@ Rectangle
                 visible: false
                 text: qsTr("Логин обязателен")
             }
-
-
         }
         TextField
         {
@@ -134,6 +131,7 @@ Rectangle
             Layout.alignment: Qt.AlignHCenter
 
             spacing: 15
+
             Button
             {
                 id: confirm_login
@@ -149,6 +147,15 @@ Rectangle
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
                 }
+                ErrorString
+                {
+                    id: authErrorString
+                    visible: false
+                    text: qsTr("Ошибка входа.\nПроверьте данные")
+
+                    anchors.bottom: confirm_login.top
+                    anchors.bottomMargin: 30
+                }
                 function checkFields()
                 {
                     function checkField(field, errorHandler)
@@ -163,13 +170,17 @@ Rectangle
                     }
 
                     var check_rezult = checkField(login_input, loginErrorString)
-                                     & checkField(password_input, pwErrorString);
+                            & checkField(password_input, pwErrorString);
 
                     return check_rezult;
                 }
                 onClicked: {
                     if(checkFields())
-                        auth(login_input.text, password_input.text);
+                    {
+
+                        //client.authorize(login_input.text, password_input.text)
+                        client.authSuccsess()
+                    }
                 }
 
             }
@@ -192,5 +203,11 @@ Rectangle
             }
         }
     }
-
+    Connections{
+        target: client
+        function onAuthFailure()
+        {
+            authErrorString.visible = true
+        }
+    }
 }

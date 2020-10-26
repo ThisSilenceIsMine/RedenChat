@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.12
 import GlobalQmlSettings 1.0
+import QtQuick.Layouts 1.12
 
 import reden.models.contactsModel 1.0
 
@@ -16,6 +17,34 @@ ListView
     spacing: 10
     highlight: delegateHighlight
     signal selectedChanged(int idx)
+    header: Component {
+        RowLayout
+        {
+            id: rowLayout
+            property int btnSize: 45
+            width: list.width
+            TextField {
+                id: newContactInput
+                property var accent: Material.color(Material.Teal)
+                Material.accent: accent
+                Layout.fillWidth: true
+                Layout.minimumWidth: rowLayout.btnSize * 3
+                Layout.preferredHeight: rowLayout.btnSize
+            }
+            ToolButton {
+
+                id: newContactButton
+                Layout.preferredWidth: rowLayout.btnSize
+                Layout.preferredHeight: rowLayout.btnSize
+                Layout.alignment: Qt.AlignRight
+                contentItem: Image
+                {
+                    source: "qrc:/qml/icons/add_circle_outline-white-48dp"
+                }
+            }
+        }
+    }
+
     Component
     {
         id: delegateHighlight
@@ -48,15 +77,15 @@ ListView
         avatarSource: model.avatar
         username: model.nickname
         z: 3
-//        MouseArea
-//        {
-//            anchors.fill: parent
-//            //z: 10
-//            onClicked: {
-//                list.currentIndex = index
-//                console.log("selected delegate #" + index)
-//            }
-//        }
+        //        MouseArea
+        //        {
+        //            anchors.fill: parent
+        //            //z: 10
+        //            onClicked: {
+        //                list.currentIndex = index
+        //                console.log("selected delegate #" + index)
+        //            }
+        //        }
         onClick: {
             list.currentIndex = index
             console.log("selected delegate #" + index)
