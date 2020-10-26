@@ -68,18 +68,21 @@ void Client::authorize(QString username, QString password)
     m_connection.sendPackage(package);
 }
 
-void Client::sendMessage(QString text, QString to)
+void Client::sendMessage(QString text)
 {
     net::Package package;
     QString delim = net::Package::delimiter();
     QString currentTime = QTime::currentTime().toString();
     package.setType(net::Package::DataType::TEXT_MESSAGE);
     package.setSender(m_user->username());
-    package.setDestinations({to});
+    package.setDestinations({m_contactsModel->currentDialog()});
     package.setData(currentTime + delim + text);
 
+    qDebug() << Q_FUNC_INFO << "sending " << text << " to " << m_contactsModel->currentDialog() << " from " << package.sender();
+
     m_connection.sendPackage(package);
-    m_messagesModel->append(Message{m_user->username(), text, currentTime});
+    //m_messagesModel->append(Message{m_user->username(), text, currentTime});
+    newMessage(package.sender(),currentTime,text);
 }
 
 void Client::sendImage(QString url, QString reciver)
@@ -147,6 +150,7 @@ void Client::loadMessageHistory(QJsonArray json)
     {
         newMessage(val.toString());
     }
+
 }
 
 void Client::addContact(QString contactData)
@@ -191,7 +195,6 @@ void Client::newMessage(QString sender, QString time, QString text)
     if(sender == QLatin1String("Dias") || sender == m_user->username())
     {
         Message item;
-        QStringList data = text.split(net::Package::delimiter());
         item.sender = sender;
         item.data = text;
         item.timeStamp = time;

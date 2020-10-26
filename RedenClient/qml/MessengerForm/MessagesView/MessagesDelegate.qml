@@ -16,16 +16,16 @@ Rectangle
     property string username
     property string time
     property string message
-
-    Rectangle
-    {
-        id: delimiter
-        height: 1
-        width: rowLayout.width
-        color: Qt.lighter(Material.backgroundColor)
-        anchors.bottom: rowLayout.top
-        anchors.bottomMargin: 20
-    }
+//    height: rowLayout.height + 21
+//    Rectangle
+//    {
+//        id: delimiter
+//        height: 1
+//        width: rowLayout.width
+//        color: Qt.lighter(Material.backgroundColor)
+//        anchors.bottom: rowLayout.top
+//        anchors.bottomMargin: 20
+//    }
 
     RowLayout
     {
@@ -45,11 +45,15 @@ Rectangle
         {
             id: messageContent
 
-            anchors.left: avatar.right
+            //anchors.left: avatar.right
 
-            anchors.leftMargin: 5
-            //Layout.alignment: Qt.AlignLeft
-            //Layout.leftMargin: 5
+            //anchors.leftMargin: 5
+            //Layout.fillWidth: true
+
+            Layout.alignment: Qt.AlignLeft
+            Layout.leftMargin: 5
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             //Layout.leftMargin: 5
             Label
             {
@@ -73,6 +77,7 @@ Rectangle
                 anchors.topMargin: (timeSpan.height + senderNickname.height) / 1.5
                 color: "#ffffff"
                 text: message
+                wrapMode: Text.Wrap
             }
             Image
             {

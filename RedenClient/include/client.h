@@ -38,7 +38,7 @@ public slots:
     void registerNewUser(QString username, QString password, QString imgUrl);
     void authorize(QString username, QString password);
 
-    void sendMessage(QString text, QString reciver);
+    void sendMessage(QString text);
     void sendImage(QString url, QString reciver);
     void sendDocument(QString url, QString reciver);
 
@@ -72,8 +72,6 @@ private:
     net::Connection m_connection;
     ContactsModel *m_contactsModel;
     MessagesModel *m_messagesModel;
-
-
 };
 
 #endif // CLIENT_H

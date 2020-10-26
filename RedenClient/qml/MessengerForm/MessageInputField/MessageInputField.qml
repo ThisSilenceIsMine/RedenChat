@@ -17,6 +17,7 @@ Rectangle
     radius: 8
 
     signal fileSelected()
+    signal messageSent()
 
     FontLoader { id: emojiFont; source: "qrc:/qml/fonts/OpenSansEmoji.ttf" }
     RowLayout
@@ -80,6 +81,7 @@ Rectangle
             Layout.preferredWidth: root.width - rowLayout.btnSize * 3 - rowLayout.spacing * 2 - 12
             Layout.fillHeight: true
             flickableDirection: Flickable.VerticalFlick
+            interactive: false
             TextArea.flickable: TextArea
             {
                 property var accent: Material.color(Material.DeepOrange)
@@ -158,7 +160,12 @@ Rectangle
 
                 onClicked: {
                     //highlightAnim.running = true
+                    if(textArea.text != "")
+                    {
                     sendHighlight.run()
+                    client.sendMessage(textArea.text)
+                    messageSent()
+                    }
                 }
             }
         }
