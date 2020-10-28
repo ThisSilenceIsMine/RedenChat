@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     RedenClient \
-    RedenNetworkLib
+    RedenNetworkLib \
+    RedenServer

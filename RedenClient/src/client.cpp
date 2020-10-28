@@ -144,7 +144,7 @@ void Client::getContactsList()
 
 void Client::getMessageHistory(int idx)
 {
-    Q_UNUSED(idx)
+    Q_UNUSED(idx) //Лень менять
     QString user = m_contactsModel->currentDialog();
     net::Package package;
     package.setSender(m_user->username());
@@ -208,8 +208,8 @@ void Client::addContact(QString contactData)
 
 void Client::newMessage(QString sender, QString time, QString text)
 {
-    //if(sender == m_contactsModel->currentDialog() || sender == m_user->username())
-    if(sender == QLatin1String("Dias") || sender == m_user->username())
+    if(sender == m_contactsModel->currentDialog() || sender == m_user->username())
+//    if(sender == QLatin1String("Dias") || sender == m_user->username())
     {
         Message item;
         item.sender = sender;
@@ -245,6 +245,18 @@ void Client::newImage(QString sender, QByteArray base64)
 {
     Q_UNUSED(sender)
     Q_UNUSED(base64)
+}
+
+void Client::requestContact(QString username)
+{
+    qDebug() << Q_FUNC_INFO << "GIVE ME " << username;
+    net::Package item;
+    item.setSender(m_user->username());
+    item.setType(net::Package::USER_DATA);
+    item.setDestinations({username});
+    item.setData({});
+
+    m_connection.sendPackage(item);
 }
 
 void Client::authorize(QString username, QByteArray base64)

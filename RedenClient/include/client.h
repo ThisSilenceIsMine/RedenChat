@@ -48,6 +48,7 @@ public slots:
     void loadContactsList(QJsonArray json);
     void loadMessageHistory(QJsonArray json);
 
+    void requestContact(QString username);
 private slots:
     void packageRecieved(net::Package package);
 signals:

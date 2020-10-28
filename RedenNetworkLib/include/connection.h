@@ -20,7 +20,6 @@ class REDENNETWORKLIB_EXPORT Connection : public QObject
 
 public:
     explicit Connection(QObject *parent = nullptr);
-    Connection(qintptr handle, QObject *parent = nullptr);
 
     quint16 port() const;
     QHostAddress adress() const;
@@ -31,6 +30,9 @@ public:
     void setSocketDescriptor(qintptr descriptor);
 
     void sendPackage(Package package);
+    QTcpSocket *socket() const;
+    void setSocket(QTcpSocket *socket);
+
 public slots:
     void connectToHost(QString host, quint16 port);
     void disconnect();
@@ -48,7 +50,7 @@ private slots:
     void readyRead();
 private:
     //QDataStream m_stream;
-    QTcpSocket m_socket;
+    QTcpSocket *m_socket;
     IPackageSerializer *m_serializer;
     QAbstractSocket::SocketState m_state;
     quint16 m_blockSize;
