@@ -1,6 +1,8 @@
 #include "../include/dbfacade.h"
 #include <QDebug>
 #include <QSqlError>
+#include <QDateTime>
+#include "include/package.h"
 DBFacade::DBFacade(QObject *parent) : QObject(parent)
 {
 
@@ -61,9 +63,114 @@ bool DBFacade::authorizeUser(QString username, QString password)
     }
 }
 
-void DBFacade::addMessage(QString sender, QString receiver, QString messageText, QString timestamp)
+void DBFacade::addMessage(QString sender, QString receiver, QString messageText)
 {
     QSqlQuery query(*m_db);
+
+    auto queryFailure = [](){
+            qWarning() << Q_FUNC_INFO << "Cannot execute query";
+    };
+
+    query.prepare("SELECT :id"
+                  "FROM conversations"
+                  "WHERE (title = CONCAT(:name1, \"$\", :name2))"
+                  "OR"
+                  "(title = CONCAT(:name2, \"$\", :name1))");
+    query.bindValue(":name1", sender);
+    query.bindValue(":name2", receiver);
+    int conversationId;
+    if(!query.exec())
+    {
+        queryFailure();
+    }
+    if(query.next())
+    {
+        conversationId = query.value(0).toInt();
+    }
+    else
+    {
+        qWarning() << "Conversation between" << sender << "and" << receiver << "doesn't exist";
+        return;
+    }
+    query.finish();
+    query.prepare("SELECT id"
+                  "FROM users"
+                  "WHERE nickname = :sender");
+    query.bindValue(":sender",sender);
+    int senderId;
+    if(!query.exec())
+    {
+        queryFailure();
+    }
+    if(query.next())
+    {
+        senderId = query.value(0).toInt();
+    } else {
+        qWarning() << "User " << sender << "not registered";
+        return;
+    }
+    query.finish();
+    query.prepare("INSERT INTO messages(id_sender, id_conversation, created_at"
+                  "VALUES(:senderId, :convId, :message, :createdAt)");
+    query.bindValue(":senderId", senderId);
+    query.bindValue(":convId", conversationId);
+    query.bindValue(":message",messageText);
+    query.bindValue(":createdAt",QDateTime::currentDateTime());
+    if(!query.exec())
+    {
+        queryFailure();
+    }
+}
+
+QStringList DBFacade::messageHistory(QString user1, QString user2)
+{
+    QSqlQuery query(*m_db);
+    QString messagesSelect = "SELECT u.name, m.created_at, m.message"
+                             "FROM messages AS m"
+                             "INNER JOIN users AS u"
+                             "ON u.id = m.id_sender"
+                             "WHERE id_conversation IN"
+                             "("
+                             "SELECT id "
+                             "FROM conversations"
+                             "WHERE (title = CONCAT(:name1, \"$\", :name2))"
+                             "OR"
+                             "(title = CONCAT(:name2, \"$\", :name1))"
+                             ")"
+                             "ORDER BY created_at ASC";
+    query.prepare(messagesSelect);
+    query.bindValue(":name1",user1);
+    query.bindValue(":name2",user2);
+    bool ok = query.exec();
+    if(!ok){
+        qWarning() << Q_FUNC_INFO << "Cannot execute messages select";
+    }
+    QStringList messages;
+    while(query.next()) {
+        messages << query.value(0).toString() + net::Package::delimiter()
+                + query.value(1).toDateTime().toString() + net::Package::delimiter()
+                + query.value(3).toString();
+    }
+    return messages;
+}
+
+
+void DBFacade::newConversation(QString user1, QString user2)
+{
+     QString conversationInsert =
+             "INSERT INTO conversations(title, id_creator)"
+             "SELECT :user1, :user2"
+             "WHERE"
+             "("
+             "SELECT COUNT(*)"
+             "FROM conversations"
+             "WHERE (title = CONCAT(:user1, \"$\", :user2))"
+             "OR"
+             "(title = CONCAT(:user2, \"$\", :user1)"
+             ") = 0;"
+             "SELECT LAST_INSERT_ID();";
+
+
 }
 
 QSqlDatabase *DBFacade::db() const

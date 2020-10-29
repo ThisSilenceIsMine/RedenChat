@@ -17,13 +17,12 @@ public:
 
     bool registerUser(QString username, QString password, QString imageUrl);
     bool authorizeUser(QString username, QString password);
-    void addMessage(QString sender, QString receiver, QString messageText, QString timestamp);
-//    QStringList messageHistory(QStringList conversants);
-//    bool getUserData(QStringView username, QString* imageUrl);
+    void addMessage(QString sender, QString receiver, QString messageText);
+    QStringList messageHistory(QString user1, QString user2);
+    void newConversation(QString user1, QString user2);
 
 signals:
     void error();
-
 private:
     QSqlDatabase *m_db;
 };
