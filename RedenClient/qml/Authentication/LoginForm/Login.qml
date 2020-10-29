@@ -177,9 +177,7 @@ Rectangle
                 onClicked: {
                     if(checkFields())
                     {
-
-                        //client.authorize(login_input.text, password_input.text)
-                        client.authSuccsess()
+                        client.authorize(login_input.text, password_input.text)
                     }
                 }
 

@@ -45,34 +45,34 @@ int main(int argc, char *argv[])
     client.setMessagesModel(&messagesModel);
 
     UserData user;
-    user.setUsername("Raiden");
     client.setUser(&user);
 
+    client.start();
 
-    QString fileUrl = QDir::currentPath() + "/Contacts.json";
-    QFile file(fileUrl);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
+//    QString fileUrl = QDir::currentPath() + "/Contacts.json";
+//    QFile file(fileUrl);
+//    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+//    {
 
-        QJsonDocument js = QJsonDocument::fromJson(file.readAll());
+//        QJsonDocument js = QJsonDocument::fromJson(file.readAll());
 
-        file.close();
-        QJsonArray arr = js["data"].toVariant().toJsonArray();
+//        file.close();
+//        QJsonArray arr = js["data"].toVariant().toJsonArray();
 
-        client.loadContactsList(arr);
+//        client.loadContactsList(arr);
 
-    }
+//    }
 
-    QString msgUrl = QDir::currentPath() + "/Messages.json";
-    QFile msgFile(msgUrl);
-    if(msgFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QJsonDocument js = QJsonDocument::fromJson(msgFile.readAll());
+//    QString msgUrl = QDir::currentPath() + "/Messages.json";
+//    QFile msgFile(msgUrl);
+//    if(msgFile.open(QIODevice::ReadOnly | QIODevice::Text))
+//    {
+//        QJsonDocument js = QJsonDocument::fromJson(msgFile.readAll());
 
-        msgFile.close();
-        QJsonArray arr = js["data"].toVariant().toJsonArray();
-        client.loadMessageHistory(arr);
-    }
+//        msgFile.close();
+//        QJsonArray arr = js["data"].toVariant().toJsonArray();
+//        client.loadMessageHistory(arr);
+//    }
     QQmlApplicationEngine engine;
 
     //qmlRegisterUncreatableType<ContactsList>("reden.models.contactsList",1,0,"ContactsList",QStringLiteral("ContactsList cannot be created in QML"));

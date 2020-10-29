@@ -33,12 +33,10 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
 {
     net::Package package;
     QString fixedUrl = imgUrl.remove(0,8); // Удаляем "file:///" с начала пути
-    m_user->setUsername(username);
-    m_user->setImageUrl(fixedUrl);
 
     QString delim = net::Package::delimiter();
+    package.setSender(username);
     package.setType(net::Package::DataType::REGISTRATION_REQUEST);
-    package.setSender(m_user->username());
     package.setDestinations({});
     bool ok = false;
 
@@ -51,7 +49,6 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     QByteArray imgRaw;
     QBuffer buff(&imgRaw);
 
-
     buff.open(QIODevice::WriteOnly | QIODevice::Truncate);
     ok = avatar.save(&buff, "PNG");
     if(!ok)
@@ -61,8 +58,7 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     buff.close();
     QString avatarBase64 = imgRaw.toBase64();
 
-    package.setData(username + delim +
-                    password + delim +
+    package.setData(password + delim +
                     avatarBase64);
 
 
@@ -73,14 +69,12 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
 void Client::authorize(QString username, QString password)
 {
     net::Package package;
-    QString delim = net::Package::delimiter();
 
     package.setType(net::Package::DataType::AUTH_REQUEST);
-    package.setSender(m_user->username());
+    package.setSender(username);
     package.setDestinations({});
 
-    package.setData(username + delim +
-                    password);
+    package.setData(password);
 
     m_connection.sendPackage(package);
 }
@@ -299,6 +293,13 @@ void Client::setUser(UserData *user)
     m_user = user;
 }
 
+void Client::start()
+{
+    m_connection.createSocket();
+    m_connection.connectToHost("127.0.0.1", 2020);
+    qDebug() << "Client connected?";
+}
+
 MessagesModel *Client::messagesModel() const
 {
     return m_messagesModel;
@@ -343,9 +344,9 @@ void Client::packageRecieved(net::Package package)
         break;
 
     case net::Package::AUTH_REQUEST: //Ответ на авторизацию Данные пустые = фейл
-        if(!data.isEmpty())
+        if(!data.isEmpty() && !package.destinations().empty() && package.sender() == "")
         {
-            authorize(package.sender(), data);
+            authorize(package.destinations().first(), data);
             emit authSuccsess();
         }
         else

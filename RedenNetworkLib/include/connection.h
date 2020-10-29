@@ -33,6 +33,7 @@ public:
     QTcpSocket *socket() const;
     void setSocket(QTcpSocket *socket);
 
+    void createSocket();
 public slots:
     void connectToHost(QString host, quint16 port);
     void disconnect();

@@ -1,4 +1,5 @@
 #include "../include/connection.h"
+#include <QDebug>
 namespace net
 {
 
@@ -45,6 +46,8 @@ void Connection::connectToHost(QString host, quint16 port)
     if(m_socket->isOpen()) disconnect();
 
     m_socket->connectToHost(host,port);
+    qDebug() << "Connection should be established";
+
 }
 
 void Connection::disconnect()
@@ -61,6 +64,7 @@ void Connection::messageReceived(const Package &package)
 void Connection::connected()
 {
     emit readyForUse();
+    qDebug() << Q_FUNC_INFO << "Connected!";
 }
 
 void Connection::disconnected()
@@ -145,6 +149,12 @@ void Connection::setSocket(QTcpSocket *socket)
     connect(m_socket,&QTcpSocket::stateChanged,this,&Connection::stateChanged);
     connect(m_socket,&QTcpSocket::readyRead,this,&Connection::readyRead);
     connect(m_socket,qOverload<QAbstractSocket::SocketError>(&QAbstractSocket::errorOccurred),this,&Connection::error);
+}
+
+void Connection::createSocket()
+{
+    QTcpSocket *sock = new QTcpSocket();
+    setSocket(sock);
 }
 
 }

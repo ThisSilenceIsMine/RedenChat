@@ -20,7 +20,7 @@ public:
     void addMessage(QString sender, QString receiver, QString messageText);
     QStringList messageHistory(QString user1, QString user2);
     void newConversation(QString user1, QString user2);
-
+    QString userImage(QString username); //returns avatar Url from db
 signals:
     void error();
 private:

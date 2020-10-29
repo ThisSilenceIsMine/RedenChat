@@ -159,18 +159,52 @@ void DBFacade::newConversation(QString user1, QString user2)
 {
      QString conversationInsert =
              "INSERT INTO conversations(title, id_creator)"
-             "SELECT :user1, :user2"
+             "SELECT CONCAT(:user1, \"$\", :user2)"
              "WHERE"
              "("
-             "SELECT COUNT(*)"
-             "FROM conversations"
-             "WHERE (title = CONCAT(:user1, \"$\", :user2))"
-             "OR"
-             "(title = CONCAT(:user2, \"$\", :user1)"
-             ") = 0;"
-             "SELECT LAST_INSERT_ID();";
+                "SELECT COUNT(*)"
+                "FROM conversations"
+                "WHERE ("
+                "title = CONCAT(:user1, \"$\", :user2))"
+                "OR"
+                "(title = CONCAT(:user2, \"$\", :user1)"
+                ") = 0"
+             "AND"
+                "(:user1 IN (SELECT nickname FROM users))"
+             "AND"
+                "(:user2 IN (SELECT nickname FROM users))";
+    QSqlQuery query(*m_db);
+    query.bindValue(":user1", user1);
+    query.bindValue(":user2",user2);
 
+    bool ok = query.exec();
+    if(!ok) {
+        qWarning() << Q_FUNC_INFO << "Cannot execute query";
+    }
+}
 
+QString DBFacade::userImage(QString username)
+{
+    QString selectQuery =
+            "SELECT url FROM attachments AS at"
+            "WHERE at.id IN "
+            "("
+                "SELECT id_picture"
+                "FROM users"
+                "WHERE nickname = :username"
+            ")";
+    QSqlQuery query(*m_db);
+    query.prepare(selectQuery);
+    query.bindValue(":username", username);
+    bool ok = query.exec();
+    if(!ok) {
+        qWarning() << Q_FUNC_INFO << "Cannot get user url";
+    }
+    if(query.next()) {
+        return query.value(0).toString();
+    } else {
+        return {};
+    }
 }
 
 QSqlDatabase *DBFacade::db() const

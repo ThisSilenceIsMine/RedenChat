@@ -1,7 +1,8 @@
 #include <QCoreApplication>
 #include <QSqlDatabase>
-
+#include <QDebug>
 #include "server.h"
+#include "dbfacade.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +15,21 @@ int main(int argc, char *argv[])
     db.setPassword("");
 
     bool ok = db.open();
+    if(!ok) {
+        qInfo() << "Can't connect to database";
+    } else {
+        qInfo() << "Database connected!";
+
+        DBFacade databaseWrapper;
+        databaseWrapper.setDb(&db);
+
+        Server server;
+        server.setDatabase(&databaseWrapper);
+
+        server.start();
+    }
+
+
 
     return a.exec();
 }
