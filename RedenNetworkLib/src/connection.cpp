@@ -6,6 +6,7 @@ namespace net
 Connection::Connection(QObject *parent)
     : QObject(parent)
     , m_socket{nullptr}
+    , m_blockSize{0}
     //, m_stream{m_socket}
 {
     m_serializer = new PackageJsonSerializer();
@@ -94,33 +95,41 @@ void Connection::sendPackage(Package package)
     QDataStream out(&block, QIODevice::WriteOnly);
 
     out << quint16(rawData.size()) << rawData;
-
+    qDebug() << "Data size should be: " << rawData.size();
     m_socket->write(block);
 }
 
 void Connection::readyRead()
 {
+    qDebug() << Q_FUNC_INFO << m_socket->bytesAvailable();
     QDataStream in(m_socket);
 
     if(m_blockSize == 0)
     {
         if(m_socket->bytesAvailable() < int(sizeof(quint16)))
         {
+            qDebug() << "Can't read size";
             return;
         }
 
         in >> m_blockSize;
+        qDebug() << "Block size = " << m_blockSize;
     }
 
-    if(m_socket->bytesAvailable() < m_blockSize)
+    if(m_socket->bytesAvailable() < m_blockSize) {
+        qDebug() << "Not enough data. Waiting for next part";
         return;
-    else
+    } else {
+        qDebug() << m_socket->bytesAvailable() << "should be enough. Reading...";
         m_blockSize = 0;
-
+    }
     QByteArray rawData;
 
     in >> rawData;
-
+    if(rawData.size() == 0) {
+        qDebug() << "Data size == 0";
+    }
+    qDebug() << rawData;
     Package message;
     bool ok;
 
@@ -128,6 +137,7 @@ void Connection::readyRead()
 
     if(!ok)
     {
+        qDebug() << "Deserializing went wrong!";
         return;
     }
 

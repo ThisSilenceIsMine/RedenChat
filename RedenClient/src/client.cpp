@@ -296,7 +296,7 @@ void Client::setUser(UserData *user)
 void Client::start()
 {
     m_connection.createSocket();
-    m_connection.connectToHost("127.0.0.1", 2020);
+    m_connection.connectToHost("127.0.0.1", 52484);
     qDebug() << "Client connected?";
 }
 

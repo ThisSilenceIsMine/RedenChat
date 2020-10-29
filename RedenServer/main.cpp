@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     db.setDatabaseName("RedenDB");
     db.setUserName("root");
     db.setPassword("");
-
+    Server server;
     bool ok = db.open();
     if(!ok) {
         qInfo() << "Can't connect to database";
@@ -23,13 +23,10 @@ int main(int argc, char *argv[])
         DBFacade databaseWrapper;
         databaseWrapper.setDb(&db);
 
-        Server server;
         server.setDatabase(&databaseWrapper);
 
         server.start();
     }
-
-
 
     return a.exec();
 }

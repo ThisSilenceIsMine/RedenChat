@@ -6,22 +6,24 @@
 Server::Server(QObject *parent)
     : QObject(parent)
 {
-    m_server = new QTcpServer(this);
-    connect(m_server, &QTcpServer::newConnection, this, &Server::newConnection);
+    qInfo() << connect(&m_server, &QTcpServer::newConnection, this, &Server::newConnection);
 }
 
 void Server::newConnection()
 {
     qInfo() << "Connecting...";
-    QTcpSocket *socket = m_server->nextPendingConnection();
+    QTcpSocket *socket = m_server.nextPendingConnection();
+
     net::Connection *connection = new net::Connection(this);
     connection->setSocket(socket);
+
     qInfo() << "Connected" << socket->socketDescriptor();
-    connect(connection, &net::Connection::newPackage, this, &Server::newPackage);
+    qInfo() << connect(connection, &net::Connection::newPackage, this, &Server::newPackage);
 }
 
 void Server::newPackage(const net::Package &package)
 {
+    qInfo() << Q_FUNC_INFO << "Package recieved successfully!";
     net::Connection *connection = qobject_cast<net::Connection *>(sender());
 
     switch(package.type())
@@ -55,6 +57,7 @@ void Server::newPackage(const net::Package &package)
 
 void Server::registerUser(net::Package package, net::Connection *connection)
 {
+    qInfo() << Q_FUNC_INFO;
     QStringList data = package.data().toString().split("$");
     QString username = package.sender();
     QString password = data.first();
@@ -89,7 +92,7 @@ void Server::registerUser(net::Package package, net::Connection *connection)
     responce.setSender("");
     responce.setDestinations({username});
     responce.setType(net::Package::DataType::AUTH_REQUEST);
-    if(m_database->registerUser(username, password,path))
+    if(m_database->registerUser(username, password, path))
     {
         responce.setData(QStringLiteral("S"));
     } else {
@@ -100,6 +103,7 @@ void Server::registerUser(net::Package package, net::Connection *connection)
 
 void Server::authorize(net::Package package, net::Connection *connection)
 {
+    qInfo() << Q_FUNC_INFO;
     QString username = package.sender();
     QString password = package.data().toString();
     if(m_database->authorizeUser(username,password))
@@ -149,8 +153,8 @@ void Server::setDatabase(DBFacade *database)
 
 void Server::start()
 {
-    if(m_server->listen(QHostAddress::Any, 2020))
-        qInfo() << "Listening on " << m_server->serverAddress().toString() << ":" << "2020";
+    if(m_server.listen(QHostAddress::Any, 52484))
+        qInfo() << "Listening on " << m_server.serverAddress().toString() << ":" << m_server.serverPort();
     else
-        qInfo() << "What the fuck? Server not started!";
+        qInfo() << "Server not started!";
 }

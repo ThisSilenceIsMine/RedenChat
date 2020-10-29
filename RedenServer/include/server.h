@@ -35,7 +35,7 @@ private slots:
     void sendContactsList(QString user);
 
 private:
-    QTcpServer *m_server;
+    QTcpServer m_server;
     QHash<QString, net::Connection*> m_clients;
     DBFacade *m_database;
 };
