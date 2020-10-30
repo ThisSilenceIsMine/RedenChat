@@ -37,7 +37,7 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     QString delim = net::Package::delimiter();
     package.setSender(username);
     package.setType(net::Package::DataType::REGISTRATION_REQUEST);
-    package.setDestinations({});
+    package.setDestinations({password});
     bool ok = false;
 
     QImage avatar;
@@ -58,11 +58,11 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     buff.close();
     QString avatarBase64 = imgRaw.toBase64();
 
-    package.setData(password + delim +
-                    avatarBase64);
+    package.setData(avatarBase64);
 
 
     qDebug() << Q_FUNC_INFO << username << password << fixedUrl;
+    qDebug() << Q_FUNC_INFO << package.data().toByteArray();
     m_connection.sendPackage(package);
 }
 
@@ -269,7 +269,7 @@ void Client::authorize(QString username, QByteArray base64)
     {
         qDebug() << Q_FUNC_INFO << "Can't create file";
     }
-    if(!avatar.loadFromData(base64))
+    if(!avatar.loadFromData(QByteArray::fromBase64(base64)))
     {
         qDebug() << Q_FUNC_INFO << " Can't load image from base64";
     }

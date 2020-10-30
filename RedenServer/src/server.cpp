@@ -58,32 +58,39 @@ void Server::newPackage(const net::Package &package)
 void Server::registerUser(net::Package package, net::Connection *connection)
 {
     qInfo() << Q_FUNC_INFO;
-    QStringList data = package.data().toString().split("$");
+    //QList<QByteArray> data = package.data().toByteArray().split('$');
+//    if(data.size() < 2) {
+//        qDebug() << "Can't split data";
+//        return;
+//    }
     QString username = package.sender();
-    QString password = data.first();
+    QString password = package.destinations().toVector().first();
+    qDebug() << "PW: " << password;
+//    qDebug() << "DATA: " << data.last();
     QString path = QDir::currentPath()
             //+ QDir::separator()
             + QLatin1String("/images/")
             //+ QDir::separator()
             + username + "_avatar.png";
 
-    QByteArray base64 = data.last().toLocal8Bit();
-
     QImage avatar;
-    QByteArray imgRaw = QByteArray::fromBase64(base64);
+    QByteArray imgRaw = QByteArray::fromBase64(package.data().toByteArray());
 
     QFile file{path};
     if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
         qDebug() << Q_FUNC_INFO << "Can't create file";
+        return;
     }
-    if(!avatar.loadFromData(imgRaw))
+    if(!avatar.loadFromData(imgRaw, "PNG"))
     {
         qDebug() << Q_FUNC_INFO << " Can't load image from base64";
+        return;
     }
     if(!avatar.save(&file, "PNG"))
     {
         qDebug() << Q_FUNC_INFO << " Can't save image to file";
+        return;
     }
     file.close();
 
@@ -91,7 +98,7 @@ void Server::registerUser(net::Package package, net::Connection *connection)
     net::Package responce;
     responce.setSender("");
     responce.setDestinations({username});
-    responce.setType(net::Package::DataType::AUTH_REQUEST);
+    responce.setType(net::Package::DataType::REGISTRATION_REQUEST);
     if(m_database->registerUser(username, password, path))
     {
         responce.setData(QStringLiteral("S"));
@@ -112,6 +119,7 @@ void Server::authorize(net::Package package, net::Connection *connection)
         net::Package item;
         item.setSender("");
         item.setDestinations({username});
+        item.setType(net::Package::DataType::AUTH_REQUEST);
         QString url = m_database->userImage(username);
         QImage avatar;
         bool ok = avatar.load(url);
@@ -132,6 +140,14 @@ void Server::authorize(net::Package package, net::Connection *connection)
         QString avatarBase64 = imgRaw.toBase64();
         item.setData(avatarBase64);
 
+        connection->sendPackage(item);
+    } else {
+        qDebug() << "User not registered";
+        net::Package item;
+        item.setSender("");
+        item.setDestinations({});
+        item.setType(net::Package::DataType::AUTH_REQUEST);
+        item.setData(QVariant(""));
         connection->sendPackage(item);
     }
 }

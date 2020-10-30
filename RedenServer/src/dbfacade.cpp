@@ -48,7 +48,7 @@ bool DBFacade::authorizeUser(QString username, QString password)
     QSqlQuery query(*m_db);
     query.prepare("SELECT COUNT(*)"
                   "FROM users "
-                  "WHERE nickname = :nickname AND password = :password");
+                  "WHERE nickname = :username AND password = :password");
     query.bindValue(":username",username);
     query.bindValue(":password", password);
     if(query.exec() && query.next())
@@ -174,6 +174,7 @@ void DBFacade::newConversation(QString user1, QString user2)
              "AND"
                 "(:user2 IN (SELECT nickname FROM users))";
     QSqlQuery query(*m_db);
+    query.prepare(conversationInsert);
     query.bindValue(":user1", user1);
     query.bindValue(":user2",user2);
 
@@ -185,20 +186,25 @@ void DBFacade::newConversation(QString user1, QString user2)
 
 QString DBFacade::userImage(QString username)
 {
-    QString selectQuery =
-            "SELECT url FROM attachments AS at"
-            "WHERE at.id IN "
-            "("
-                "SELECT id_picture"
-                "FROM users"
-                "WHERE nickname = :username"
-            ")";
+
     QSqlQuery query(*m_db);
-    query.prepare(selectQuery);
+//    query.prepare("SELECT url FROM attachments"
+//                  "WHERE id ="
+//                  "("
+//                      "SELECT id_picture "
+//                      "FROM users "
+//                      "WHERE (nickname = :username)"
+//                  ")");
+    query.prepare("SELECT at.url "
+                  "FROM attachments at "
+                  "INNER JOIN users u "
+                  "ON u.id_picture = at.id "
+                  "WHERE u.nickname = :username");
+    qDebug() << Q_FUNC_INFO << "Getting url for " << username;
     query.bindValue(":username", username);
     bool ok = query.exec();
     if(!ok) {
-        qWarning() << Q_FUNC_INFO << "Cannot get user url";
+        qWarning() << Q_FUNC_INFO << "Cannot get user url" << query.lastError().text();
     }
     if(query.next()) {
         return query.value(0).toString();

@@ -37,7 +37,6 @@ ApplicationWindow {
             MessengerForm
             {
                 id: mainForm
-
             }
         }
         Component
@@ -60,11 +59,7 @@ ApplicationWindow {
                 onGotoRegister: {
                     stackView.push(registerFormStackComponent)
                 }
-                //                onAuth: {
-                //                    if(stackView.depth > 1)
-                //                        stackView.pop()
-                //                    stackView.push(mainFormStackComponent)
-                //                }
+
                 Connections{
                     target: client
                     function onAuthSuccsess()

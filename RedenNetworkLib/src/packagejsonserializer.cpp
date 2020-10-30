@@ -23,7 +23,7 @@ QByteArray PackageJsonSerializer::toBytes(Package package)
     map["sender"] = package.sender();
     map["destinations"] = QVariant(package.destinations());
     map["type"] = QVariant( m_types.valueToKey(package.type()) );
-    map["data"] = package.data().toByteArray().toBase64();
+    map["data"] = package.data();
 
     return QJsonDocument::fromVariant(map).toJson();
 }
@@ -59,7 +59,7 @@ Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
     package.setSender(sender.toString());
     package.setDestinations(qvariant_cast<QStringList>(destinationsList.toVariant()));
     package.setType(static_cast<Package::DataType>(m_types.keyToValue(type.toString().toLocal8Bit().data())));
-    package.setData(QByteArray::fromBase64(data.toVariant().toByteArray()));
+    package.setData(data.toVariant().toByteArray());
     *ok = true;
     return package;
 }
