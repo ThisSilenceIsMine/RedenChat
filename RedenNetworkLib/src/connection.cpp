@@ -129,7 +129,6 @@ void Connection::readyRead()
     if(rawData.size() == 0) {
         qDebug() << "Data size == 0";
     }
-    qDebug() << rawData;
     Package message;
     bool ok;
 
@@ -137,7 +136,7 @@ void Connection::readyRead()
 
     if(!ok)
     {
-        qDebug() << "Deserializing went wrong!";
+        qDebug() << Q_FUNC_INFO << "Deserializing went wrong!";
         return;
     }
 

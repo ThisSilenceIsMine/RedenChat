@@ -44,6 +44,14 @@ void Package::setData(const QVariant &data)
     m_data = data;
 }
 
+void Package::setJsonArr(const QJsonArray &arr)
+{
+    qDebug() << Q_FUNC_INFO;
+    QJsonDocument doc;
+    doc.setArray(arr);
+    m_data = doc.toJson();
+}
+
 QString Package::delimiter()
 {
     return "$";

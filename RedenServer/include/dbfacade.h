@@ -21,6 +21,9 @@ public:
     QStringList messageHistory(QString user1, QString user2);
     void newConversation(QString user1, QString user2);
     QString userImage(QString username); //returns avatar Url from db
+
+    QHash<QString, QString> contactsList(QString user);
+
 signals:
     void error();
 private:

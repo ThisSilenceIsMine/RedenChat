@@ -1,4 +1,4 @@
-QT -= gui
+QT += gui
 QT += network
 TEMPLATE = lib
 DEFINES += REDENNETWORKLIB_LIBRARY
@@ -10,7 +10,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 INCLUDEPATH += $$PWD/include
 
-
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 SOURCES += \
     src/connection.cpp \
     src/package.cpp \
@@ -21,6 +21,7 @@ HEADERS += \
     include/IPackageSerializer.h \
     include/RedenNetworkLib_global.h \
     include/connection.h \
+    include/imageserializer.h \
     include/package.h \
     include/packagejsonserializer.h
 

@@ -129,9 +129,9 @@ void Client::getContactsList()
 {
     net::Package package;
     package.setSender(m_user->username());
-    package.setDestinations({});
+    package.setDestinations({""});
     package.setType(net::Package::DataType::CONTACTS_LIST);
-    package.setData({}); //Don't need any data here. Placeholder for furher rework
+    package.setData({""}); //Don't need any data here. Placeholder for furher rework
 
     m_connection.sendPackage(package);
 }
@@ -330,10 +330,11 @@ void Client::setContactsModel(ContactsModel *contactsModel)
 void Client::packageRecieved(net::Package package)
 {
     QByteArray data = package.data().toByteArray();
-
+    qDebug() << "Recieved package of type" << package.type();
     switch(package.type())
     {
     case net::Package::CONTACTS_LIST: //Спислк контактов. Получаем сразе после входа в аккаунт
+        qDebug() << package.data();
         loadContactsList(package.data().toJsonArray());
         break;
     case net::Package::REGISTRATION_REQUEST:
@@ -348,6 +349,7 @@ void Client::packageRecieved(net::Package package)
         {
             authorize(package.destinations().first(), data);
             emit authSuccsess();
+            getContactsList();
         }
         else
             emit authFailure();
@@ -370,8 +372,12 @@ void Client::packageRecieved(net::Package package)
     }
 }
 
-void Client::loadContactsList(QJsonArray json)
+void Client::loadContactsList(const QJsonArray &json)
 {
+    if(json.isEmpty()) {
+        qDebug() << Q_FUNC_INFO << "Json array is empty";
+        return;
+    }
     foreach(QJsonValue contact, json)
     {
         qDebug() << Q_FUNC_INFO << "Invoking addContact";

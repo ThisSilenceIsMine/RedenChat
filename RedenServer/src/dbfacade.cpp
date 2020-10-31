@@ -13,8 +13,7 @@ bool DBFacade::registerUser(QString username, QString password, QString imageUrl
 {
     QSqlQuery query(*m_db);
     query.prepare("INSERT INTO attachments (id_message, url)"
-                  "VALUES (:null, :url);"
-                  "SELECT LAST_INSERT_ID();");
+                  "VALUES (:null, :url)");
 
     query.bindValue(":null", QVariant());
     query.bindValue(":url", imageUrl);
@@ -24,11 +23,7 @@ bool DBFacade::registerUser(QString username, QString password, QString imageUrl
         qWarning() << Q_FUNC_INFO << "Inserting image failed" << query.lastError().text();
         return false;
     }
-    int id = 0;
-    while(query.next())
-    {
-        id = query.value(0).toInt();
-    }
+    int id = query.lastInsertId().toInt();
     query.finish();
 
     query.prepare("INSERT INTO users (nickname, password, id_picture)"
@@ -157,6 +152,7 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
 
 void DBFacade::newConversation(QString user1, QString user2)
 {
+    //Хуйня. Нужно еще челиков в parrticipants инсертить
      QString conversationInsert =
              "INSERT INTO conversations(title, id_creator)"
              "SELECT CONCAT(:user1, \"$\", :user2)"
@@ -186,20 +182,14 @@ void DBFacade::newConversation(QString user1, QString user2)
 
 QString DBFacade::userImage(QString username)
 {
-
     QSqlQuery query(*m_db);
-//    query.prepare("SELECT url FROM attachments"
-//                  "WHERE id ="
-//                  "("
-//                      "SELECT id_picture "
-//                      "FROM users "
-//                      "WHERE (nickname = :username)"
-//                  ")");
+
     query.prepare("SELECT at.url "
                   "FROM attachments at "
                   "INNER JOIN users u "
                   "ON u.id_picture = at.id "
                   "WHERE u.nickname = :username");
+
     qDebug() << Q_FUNC_INFO << "Getting url for " << username;
     query.bindValue(":username", username);
     bool ok = query.exec();
@@ -211,6 +201,31 @@ QString DBFacade::userImage(QString username)
     } else {
         return {};
     }
+}
+
+QHash<QString, QString> DBFacade::contactsList(QString user)
+{
+    QSqlQuery query(*m_db);
+    QString queryString =
+            "SELECT u.nickname, a.url "
+            "FROM users u "
+            "INNER JOIN attachments a ON a.id = u.id_picture "
+            "INNER JOIN parritcipants p ON u.id = p.id_user "
+            "INNER JOIN conversations c ON p.id_conversation = c.id "
+            "WHERE u.nickname != :username";
+    query.prepare(queryString);
+    query.bindValue(":username", user);
+    bool ok = query.exec();
+    if(!ok) {
+        qDebug() << Q_FUNC_INFO << query.lastError().text();
+    }
+    QHash<QString, QString> contacts;
+    while(query.next()) {
+        QString contactName = query.value(0).toString();
+        QString url = query.value(1).toString();
+        contacts[contactName] = url;
+    }
+    return contacts;
 }
 
 QSqlDatabase *DBFacade::db() const

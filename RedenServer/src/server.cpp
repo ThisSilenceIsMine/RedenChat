@@ -1,8 +1,8 @@
 #include "../include/server.h"
 #include "../include/dbfacade.h"
-#include <QImage>
-#include <QBuffer>
+
 #include <QDir>
+
 Server::Server(QObject *parent)
     : QObject(parent)
 {
@@ -29,7 +29,7 @@ void Server::newPackage(const net::Package &package)
     switch(package.type())
     {
     case net::Package::CONTACTS_LIST: //Спислк контактов. Получаем сразе после входа в аккаунт
-        qWarning() << "Why the fuck you sent me contacts list";
+        sendContactsList(package.sender());
         break;
     case net::Package::REGISTRATION_REQUEST:
         registerUser(package,connection);
@@ -72,27 +72,9 @@ void Server::registerUser(net::Package package, net::Connection *connection)
             + QLatin1String("/images/")
             //+ QDir::separator()
             + username + "_avatar.png";
-
-    QImage avatar;
     QByteArray imgRaw = QByteArray::fromBase64(package.data().toByteArray());
 
-    QFile file{path};
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qDebug() << Q_FUNC_INFO << "Can't create file";
-        return;
-    }
-    if(!avatar.loadFromData(imgRaw, "PNG"))
-    {
-        qDebug() << Q_FUNC_INFO << " Can't load image from base64";
-        return;
-    }
-    if(!avatar.save(&file, "PNG"))
-    {
-        qDebug() << Q_FUNC_INFO << " Can't save image to file";
-        return;
-    }
-    file.close();
+    ImageSerializer::fromBase64(imgRaw,path);
 
     //Отправляем клиенту результат регистрации
     net::Package responce;
@@ -121,23 +103,7 @@ void Server::authorize(net::Package package, net::Connection *connection)
         item.setDestinations({username});
         item.setType(net::Package::DataType::AUTH_REQUEST);
         QString url = m_database->userImage(username);
-        QImage avatar;
-        bool ok = avatar.load(url);
-        if(!ok)
-        {
-            qDebug() << Q_FUNC_INFO << "Can't load image from " << url;
-        }
-        QByteArray imgRaw;
-        QBuffer buff(&imgRaw);
-
-        buff.open(QIODevice::WriteOnly | QIODevice::Truncate);
-        ok = avatar.save(&buff, "PNG");
-        if(!ok)
-        {
-            qDebug() << "Can't save image to buffer";
-        }
-        buff.close();
-        QString avatarBase64 = imgRaw.toBase64();
+        QString avatarBase64 = ImageSerializer::toBase64(url);//imgRaw.toBase64();
         item.setData(avatarBase64);
 
         connection->sendPackage(item);
@@ -159,7 +125,25 @@ void Server::sendMessageHistory(QStringList conversants)
 
 void Server::sendContactsList(QString user)
 {
+    //    nickname, url
+    QHash<QString, QString> contacts = m_database->contactsList(user);
 
+    net::Package item;
+    item.setSender("");
+    item.setType(net::Package::DataType::CONTACTS_LIST);
+    item.setDestinations({user});
+    QJsonArray formattedContacts;
+    QHashIterator<QString, QString> i(contacts);
+    while(i.hasNext()) {
+        i.next();
+        QString nickname = i.key();
+        QByteArray base64 = ImageSerializer::toBase64(i.value());
+        formattedContacts.append(nickname + net::Package::delimiter() + base64);
+    }
+    qDebug() << Q_FUNC_INFO << formattedContacts.size();
+    item.setJsonArr(formattedContacts);
+
+    m_clients.value(user)->sendPackage(item);
 }
 
 void Server::setDatabase(DBFacade *database)

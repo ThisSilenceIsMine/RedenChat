@@ -46,7 +46,7 @@ public slots:
     void getContactsList();
     void getMessageHistory(int idx);
 
-    void loadContactsList(QJsonArray json);
+    void loadContactsList(const QJsonArray &json);
     void loadMessageHistory(QJsonArray json);
 
     void requestContact(QString username);

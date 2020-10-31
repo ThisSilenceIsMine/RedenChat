@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QVariant>
-#include <QObject>
 #include <QTcpSocket>
 #include <QByteArray>
 #include <QDebug>
@@ -14,6 +13,7 @@
 #include "include/RedenNetworkLib_global.h"
 #include "include/connection.h"
 #include "include/package.h"
+#include "include/imageserializer.h"
 
 class DBFacade;
 

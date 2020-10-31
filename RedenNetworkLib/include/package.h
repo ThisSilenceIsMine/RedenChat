@@ -44,6 +44,7 @@ public:
 
     QVariant data() const;
     void setData(const QVariant &data);
+    void setJsonArr(const QJsonArray &arr);
 
     static QString delimiter();
 private:
