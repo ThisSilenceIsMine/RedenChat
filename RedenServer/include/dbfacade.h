@@ -21,6 +21,11 @@ public:
     QStringList messageHistory(QString user1, QString user2);
     bool newConversation(const QString &user1, const QString &user2);
     QString userImage(QString username); //returns avatar Url from db
+    void newMessage(const QString &sender,
+                    const QStringList &recievers,
+                    const QString& text,
+                    const QString &dateTime);
+
 
     QHash<QString, QString> contactsList(QString user);
 

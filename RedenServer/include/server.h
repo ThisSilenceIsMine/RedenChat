@@ -31,9 +31,9 @@ private slots:
 
     void registerUser(net::Package package, net::Connection *connection);
     void authorize(net::Package package, net::Connection *connection);
-    void sendMessageHistory(QStringList conversants);
+    void sendMessageHistory(const QString &to, const QStringList &conversants);
     void sendContactsList(QString user);
-
+    void sendMessage(const net::Package &package);
     void newConversation(const QString &user1, const QString &user2);
 private:
     void sendContact(const QString &to, const QString &other);

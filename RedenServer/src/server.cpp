@@ -38,13 +38,13 @@ void Server::newPackage(const net::Package &package)
         authorize(package, connection);
         break;
     case net::Package::MESSAGE_HISTORY: //Переписка с контактом. Загружем при переключении на другой диалог
-
+        sendMessageHistory(package.sender(), package.destinations());
         break;
     case net::Package::USER_DATA: //Добавляем 1 контакт
         newConversation(package.sender(),package.destinations().first());
         break;
     case net::Package::TEXT_MESSAGE: //Текстовое сообщение
-
+        sendMessage(package);
         break;
     case net::Package::IMAGE:
 
@@ -118,9 +118,17 @@ void Server::authorize(net::Package package, net::Connection *connection)
     }
 }
 
-void Server::sendMessageHistory(QStringList conversants)
+void Server::sendMessageHistory(const QString &to, const QStringList &conversants)
 {
+    QStringList messageHistory = m_database->messageHistory(to, conversants.first());
 
+    net::Package item;
+    item.setSender(conversants.first());
+    item.setType(net::Package::MESSAGE_HISTORY);
+    item.setDestinations({to});
+    item.setData(messageHistory);
+
+    m_clients.value(to)->sendPackage(item);
 }
 
 void Server::sendContactsList(QString user)
@@ -144,6 +152,22 @@ void Server::sendContactsList(QString user)
     item.setData(formattedContacts);
 
     m_clients.value(user)->sendPackage(item);
+}
+
+void Server::sendMessage(const net::Package &package)
+{
+    QString sender = package.sender();
+    QStringList destinations = package.destinations();
+    QStringList data = package.data().toString().split(net::Package::delimiter());
+    QString dateTime = data.first();
+    QString text = data.last();
+    m_database->newMessage(sender,destinations,text,dateTime);
+
+    foreach(QString dest, destinations) {
+        if(m_clients.contains(dest)) {
+            m_clients.value(dest)->sendPackage(package);
+        }
+    }
 }
 
 void Server::newConversation(const QString &user1, const QString &user2)

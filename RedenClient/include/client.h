@@ -48,7 +48,7 @@ public slots:
     void getMessageHistory(int idx);
 
     void loadContactsList(const QStringList &json);
-    void loadMessageHistory(QJsonArray json);
+    void loadMessageHistory(const QStringList &json);
 
     void requestContact(QString username);
 private slots:

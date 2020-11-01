@@ -144,7 +144,7 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
     while(query.next()) {
         messages << query.value(0).toString() + net::Package::delimiter()
                 + query.value(1).toDateTime().toString() + net::Package::delimiter()
-                + query.value(3).toString();
+                + query.value(2).toString();
     }
     return messages;
 }
@@ -152,23 +152,6 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
 
 bool DBFacade::newConversation(const QString &user1, const QString &user2)
 {
-    //Хуйня. Нужно еще челиков в parrticipants инсертить
-//     QString conversationInsert =
-//             "INSERT INTO conversations(title, id_creator) "
-//             "SELECT CONCAT(:user1, \"$\", :user2), :null "
-//             "WHERE"
-//             "("
-//                "SELECT COUNT(*) "
-//                "FROM conversations "
-//                "WHERE "
-//                "(title = CONCAT(:user1, \"$\", :user2)) "
-//                "OR "
-//                "(title = CONCAT(:user2, \"$\", :user1) "
-//                ") = 0 "
-//             "AND "
-//                "(:user1 IN (SELECT nickname FROM users)) "
-//             "AND "
-//                "(:user2 IN (SELECT nickname FROM users)) ";
     QSqlQuery query(*m_db);
     query.prepare("INSERT INTO conversations(title, id_creator) "
                   "SELECT CONCAT(:user1, \"$\", :user2), :null "
@@ -246,6 +229,31 @@ QString DBFacade::userImage(QString username)
         return query.value(0).toString();
     } else {
         return {};
+    }
+}
+
+void DBFacade::newMessage(const QString &sender, const QStringList &recievers, const QString &text, const QString &dateTime)
+{
+    QString insertMessageQuery =
+            "INSERT INTO messages (id_sender, id_conversation, message, created_at, deleted_at) "
+            "SELECT u.id, c.id, :text, :datetime, :deletedat"
+            "FROM users u "
+            "INNER JOIN parritcipants p ON u.id = p.id_user "
+            "INNER JOIN conversations c ON p.id_conversation = c.id "
+            "WHERE (c.title LIKE CONCAT(:sender, '$', :receiver)) "
+            "OR (c.title LIKE CONCAT(:receiver, '$', :sender)) "
+            "AND u.nickname = :sender";
+    QSqlQuery query(*m_db);
+    query.prepare(insertMessageQuery);
+    query.bindValue(":text", text);
+    query.bindValue(":datetime", QDateTime::fromString(dateTime));
+    query.bindValue(":deletedat", QVariant());
+    query.bindValue(":sender", sender);
+    query.bindValue(":receiver", recievers.first());
+
+    bool ok = query.exec();
+    if(!ok) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
     }
 }
 

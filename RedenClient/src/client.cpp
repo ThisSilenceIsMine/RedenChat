@@ -83,7 +83,7 @@ void Client::sendMessage(QString text)
 {
     net::Package package;
     QString delim = net::Package::delimiter();
-    QString currentTime = QTime::currentTime().toString();
+    QString currentTime = QDateTime::currentDateTime().toString();
     package.setType(net::Package::DataType::TEXT_MESSAGE);
     package.setSender(m_user->username());
     package.setDestinations({m_contactsModel->currentDialog()});
@@ -144,22 +144,24 @@ void Client::getMessageHistory(int idx)
     package.setSender(m_user->username());
     package.setDestinations({user});
     package.setType(net::Package::DataType::MESSAGE_HISTORY);
-    package.setData({});
+    package.setData("");
 
     m_connection.sendPackage(package);
 }
 
-void Client::loadMessageHistory(QJsonArray json)
+void Client::loadMessageHistory(const QStringList &json)
 {
-
     if(!m_messagesModel)
     {
         return;
     }
+    if(json.isEmpty()) {
+        qWarning() << Q_FUNC_INFO << "Array is empty!";
+    }
     m_messagesModel->reset();
-    foreach(QJsonValue val, json)
+    foreach(QString val, json)
     {
-        newMessage(val.toString());
+        newMessage(val);
     }
 
 }
@@ -346,7 +348,7 @@ void Client::packageRecieved(net::Package package)
             emit authFailure();
         break;
     case net::Package::MESSAGE_HISTORY: //Переписка с контактом. Загружем при переключении на другой диалог
-        loadMessageHistory(package.data().toJsonArray());
+        loadMessageHistory(package.data().toStringList());
         break;
     case net::Package::USER_DATA: //Добавляем 1 контакт
         addContact(data);
