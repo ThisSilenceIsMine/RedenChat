@@ -34,6 +34,10 @@ private slots:
     void sendMessageHistory(QStringList conversants);
     void sendContactsList(QString user);
 
+    void newConversation(const QString &user1, const QString &user2);
+private:
+    void sendContact(const QString &to, const QString &other);
+
 private:
     QTcpServer m_server;
     QHash<QString, net::Connection*> m_clients;

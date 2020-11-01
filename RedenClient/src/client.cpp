@@ -164,12 +164,13 @@ void Client::loadMessageHistory(QJsonArray json)
 
 }
 
-void Client::addContact(QString contactData)
+void Client::addContact(const QString &contactData)
 {
     Contact item;
     QStringList data = contactData.split(net::Package::delimiter());
 
     item.nickname = data.first();
+    qDebug() << contactData;
     //QString path = *Globals::imagesPath + QDir::separator() + item.nickname + "_avatar.png";
     QString path = QDir::currentPath()
             //+ QDir::separator()
@@ -179,23 +180,9 @@ void Client::addContact(QString contactData)
     item.imageUrl = path;
 
     QImage avatar;
-    QByteArray imgRaw = QByteArray::fromBase64(data.last().toLocal8Bit());
+    QByteArray imgRaw = data.last().toLocal8Bit();
 
-    QFile file{path};
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qDebug() << Q_FUNC_INFO << "Can't create file";
-    }
-    if(!avatar.loadFromData(imgRaw))
-    {
-        qDebug() << Q_FUNC_INFO << " Can't load image from base64";
-    }
-    if(!avatar.save(&file, "PNG"))
-    {
-        qDebug() << Q_FUNC_INFO << " Can't save image to file";
-    }
-
-    file.close();
+    ImageSerializer::fromBase64(imgRaw,path);
 
     contactsModel()->append(item);
 }
@@ -244,11 +231,14 @@ void Client::newImage(QString sender, QByteArray base64)
 void Client::requestContact(QString username)
 {
     qDebug() << Q_FUNC_INFO << "GIVE ME " << username;
+    if(m_contactsModel->list()->exists(username)) {
+        return;
+    }
     net::Package item;
     item.setSender(m_user->username());
     item.setType(net::Package::USER_DATA);
     item.setDestinations({username});
-    item.setData({});
+    item.setData("");
 
     m_connection.sendPackage(item);
 }

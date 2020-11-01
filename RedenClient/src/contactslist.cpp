@@ -19,6 +19,21 @@ bool ContactsList::setItemAt(int index, const Contact &item)
     return true;
 }
 
+bool ContactsList::exists(const Contact &item) const
+{
+    return m_items.contains(item);
+}
+
+bool ContactsList::exists(const QString &username) const
+{
+    foreach(Contact c, m_items)
+    {
+        if(c.nickname == username)
+            return true;
+    }
+    return false;
+}
+
 QList<Contact> &ContactsList::items()
 {
     return m_items;

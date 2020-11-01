@@ -6,6 +6,9 @@ struct Contact
 {
     QString nickname;
     QString imageUrl;
+
+    bool operator==(const Contact& other)
+    {return this->nickname == other.nickname;}
 };
 
 class ContactsList : public QObject
@@ -15,6 +18,9 @@ public:
     explicit ContactsList(QObject *parent = nullptr);
 
     bool setItemAt(int index, const Contact &item);
+
+    bool exists(const Contact &item) const;
+    bool exists(const QString &username) const;
 
     QList<Contact> &items();
 

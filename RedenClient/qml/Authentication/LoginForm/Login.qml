@@ -63,7 +63,6 @@ Rectangle
         {
             id: login_input
             property var accent: Material.color(Material.Teal)
-            text: "login@mail.ru"
             Layout.minimumHeight: 40
             Layout.minimumWidth: 150
             Layout.fillHeight: false
@@ -88,8 +87,6 @@ Rectangle
             Layout.alignment: Qt.AlignHCenter
             width: 150
             Material.accent: accent
-
-            text: qsTr("password line")
 
             echoMode: show_password_checkbox.checked ? TextInput.Normal : TextInput.Password
 

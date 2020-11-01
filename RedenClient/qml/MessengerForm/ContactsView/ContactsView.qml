@@ -42,7 +42,8 @@ ListView
                     source: "qrc:/qml/icons/add_circle_outline-white-48dp"
                 }
                 onClicked: {
-                    client.requestContact(newContactInput.text)
+                    if(newContactInput.text != "")
+                        client.requestContact(newContactInput.text)
                 }
             }
         }

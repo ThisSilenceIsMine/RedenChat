@@ -12,6 +12,7 @@
 #include "include/RedenNetworkLib_global.h"
 #include "include/connection.h"
 #include "include/package.h"
+#include "include/imageserializer.h"
 //#include "userdata.h"
 //#include "contactsmodel.h"
 
@@ -59,7 +60,7 @@ signals:
     void authSuccsess();
     void authFailure();
 private:
-    void addContact(QString contactData);
+    void addContact(const QString &contactData);
     void addMessage(QString);
     void newMessage(QString sender, QString time,QString text);
     void newMessage(QString raw);

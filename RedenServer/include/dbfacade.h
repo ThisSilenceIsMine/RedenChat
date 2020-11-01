@@ -19,7 +19,7 @@ public:
     bool authorizeUser(QString username, QString password);
     void addMessage(QString sender, QString receiver, QString messageText);
     QStringList messageHistory(QString user1, QString user2);
-    void newConversation(QString user1, QString user2);
+    bool newConversation(const QString &user1, const QString &user2);
     QString userImage(QString username); //returns avatar Url from db
 
     QHash<QString, QString> contactsList(QString user);

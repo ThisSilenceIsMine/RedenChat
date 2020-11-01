@@ -41,7 +41,7 @@ void Server::newPackage(const net::Package &package)
 
         break;
     case net::Package::USER_DATA: //Добавляем 1 контакт
-
+        newConversation(package.sender(),package.destinations().first());
         break;
     case net::Package::TEXT_MESSAGE: //Текстовое сообщение
 
@@ -144,6 +144,39 @@ void Server::sendContactsList(QString user)
     item.setData(formattedContacts);
 
     m_clients.value(user)->sendPackage(item);
+}
+
+void Server::newConversation(const QString &user1, const QString &user2)
+{
+   if(m_database->newConversation(user1, user2))
+   {
+        sendContact(user1,user2);
+        sendContact(user2,user1);
+   }
+//   else
+//   {
+//       net::Package item;
+//       item.setSender("");
+//       item.setDestinations({user1});
+//   }
+}
+
+void Server::sendContact(const QString &to, const QString &other)
+{
+    if(!m_clients.contains(to)) {
+        //qWarning() << Q_FUNC_INFO << "User " << to << "not online";
+        return;
+    }
+    net::Package item;
+    item.setSender("");
+    item.setType(net::Package::USER_DATA);
+    item.setDestinations({to});
+    QByteArray imageBase64 = ImageSerializer::toBase64(m_database->userImage(other));
+    QString userData = other + net::Package::delimiter() + imageBase64;
+
+    item.setData(userData);
+
+    m_clients.value(to)->sendPackage(item);
 }
 
 void Server::setDatabase(DBFacade *database)

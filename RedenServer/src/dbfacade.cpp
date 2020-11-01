@@ -150,34 +150,80 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
 }
 
 
-void DBFacade::newConversation(QString user1, QString user2)
+bool DBFacade::newConversation(const QString &user1, const QString &user2)
 {
     //Хуйня. Нужно еще челиков в parrticipants инсертить
-     QString conversationInsert =
-             "INSERT INTO conversations(title, id_creator)"
-             "SELECT CONCAT(:user1, \"$\", :user2)"
-             "WHERE"
-             "("
-                "SELECT COUNT(*)"
-                "FROM conversations"
-                "WHERE ("
-                "title = CONCAT(:user1, \"$\", :user2))"
-                "OR"
-                "(title = CONCAT(:user2, \"$\", :user1)"
-                ") = 0"
-             "AND"
-                "(:user1 IN (SELECT nickname FROM users))"
-             "AND"
-                "(:user2 IN (SELECT nickname FROM users))";
+//     QString conversationInsert =
+//             "INSERT INTO conversations(title, id_creator) "
+//             "SELECT CONCAT(:user1, \"$\", :user2), :null "
+//             "WHERE"
+//             "("
+//                "SELECT COUNT(*) "
+//                "FROM conversations "
+//                "WHERE "
+//                "(title = CONCAT(:user1, \"$\", :user2)) "
+//                "OR "
+//                "(title = CONCAT(:user2, \"$\", :user1) "
+//                ") = 0 "
+//             "AND "
+//                "(:user1 IN (SELECT nickname FROM users)) "
+//             "AND "
+//                "(:user2 IN (SELECT nickname FROM users)) ";
     QSqlQuery query(*m_db);
-    query.prepare(conversationInsert);
+    query.prepare("INSERT INTO conversations(title, id_creator) "
+                  "SELECT CONCAT(:user1, \"$\", :user2), :null "
+                  "WHERE"
+                  "("
+                     "SELECT COUNT(*) "
+                     "FROM conversations "
+                     "WHERE "
+                     "(title = CONCAT(:user1, \"$\", :user2)) "
+                     "OR "
+                     "(title = CONCAT(:user2, \"$\", :user1))"
+                     ") = 0 "
+                  "AND "
+                     "(:user1 IN (SELECT nickname FROM users)) "
+                  "AND "
+                     "(:user2 IN (SELECT nickname FROM users)) ");
     query.bindValue(":user1", user1);
     query.bindValue(":user2",user2);
+    query.bindValue(":null", QVariant());
 
     bool ok = query.exec();
     if(!ok) {
-        qWarning() << Q_FUNC_INFO << "Cannot execute query";
+        qWarning() << Q_FUNC_INFO << "Cannot insert to conversations" << query.lastError().text();
+        return false;
     }
+    auto queryResultId = query.lastInsertId();
+    if(!queryResultId.isValid()) {
+        return false;
+    }
+    int conversationId = queryResultId.toInt();
+    query.finish();
+    const QString participatsIncert =
+            "INSERT INTO parritcipants (id_conversation, id_user) "
+            "SELECT :conversationId, u.id "
+            "FROM users u "
+            "WHERE u.nickname = :nickname ";
+    query.prepare(participatsIncert);
+    query.bindValue(":conversationId", conversationId);
+    query.bindValue(":nickname", user1);
+    ok = query.exec();
+    if(!ok) {
+        qWarning() << Q_FUNC_INFO << "Cannot insert to parrticipants" << query.lastError().text();
+        return false;
+    }
+    query.finish();
+    query.prepare(participatsIncert);
+    query.bindValue(":conversationId", conversationId);
+    query.bindValue(":nickname", user2);
+    ok = query.exec();
+    if(!ok) {
+        qWarning() << Q_FUNC_INFO << "Cannot insert to parrticipants";
+        return false;
+    }
+    return true;
+
 }
 
 QString DBFacade::userImage(QString username)
