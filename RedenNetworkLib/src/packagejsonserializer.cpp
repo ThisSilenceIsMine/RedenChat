@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QString>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QMetaEnum>
 
@@ -59,7 +60,14 @@ Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
     package.setSender(sender.toString());
     package.setDestinations(qvariant_cast<QStringList>(destinationsList.toVariant()));
     package.setType(static_cast<Package::DataType>(m_types.keyToValue(type.toString().toLocal8Bit().data())));
-    package.setData(data.toVariant().toByteArray());
+
+    if(package.type() == Package::CONTACTS_LIST || package.type() == Package::MESSAGE_HISTORY)
+    {
+        qDebug() << Q_FUNC_INFO << document.toJson();
+        package.setData(qvariant_cast<QStringList>(data.toVariant()));
+    } else {
+    package.setData(data.toVariant());
+    } //.toByteArray());
     *ok = true;
     return package;
 }

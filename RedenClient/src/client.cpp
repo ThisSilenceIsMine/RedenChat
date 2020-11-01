@@ -333,9 +333,10 @@ void Client::packageRecieved(net::Package package)
     qDebug() << "Recieved package of type" << package.type();
     switch(package.type())
     {
-    case net::Package::CONTACTS_LIST: //Спислк контактов. Получаем сразе после входа в аккаунт
+    case net::Package::CONTACTS_LIST:
         qDebug() << package.data();
-        loadContactsList(package.data().toJsonArray());
+
+        loadContactsList(package.data().toStringList());
         break;
     case net::Package::REGISTRATION_REQUEST:
         if(data.startsWith("S"))
@@ -372,15 +373,15 @@ void Client::packageRecieved(net::Package package)
     }
 }
 
-void Client::loadContactsList(const QJsonArray &json)
+void Client::loadContactsList(const QStringList &json)
 {
     if(json.isEmpty()) {
-        qDebug() << Q_FUNC_INFO << "Json array is empty";
+        qDebug() << Q_FUNC_INFO << "Array is empty";
         return;
     }
-    foreach(QJsonValue contact, json)
+    foreach(QString contact, json)
     {
         qDebug() << Q_FUNC_INFO << "Invoking addContact";
-        addContact(contact.toString());
+        addContact(contact);
     }
 }

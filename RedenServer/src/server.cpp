@@ -132,7 +132,7 @@ void Server::sendContactsList(QString user)
     item.setSender("");
     item.setType(net::Package::DataType::CONTACTS_LIST);
     item.setDestinations({user});
-    QJsonArray formattedContacts;
+    QStringList formattedContacts;
     QHashIterator<QString, QString> i(contacts);
     while(i.hasNext()) {
         i.next();
@@ -141,7 +141,7 @@ void Server::sendContactsList(QString user)
         formattedContacts.append(nickname + net::Package::delimiter() + base64);
     }
     qDebug() << Q_FUNC_INFO << formattedContacts.size();
-    item.setJsonArr(formattedContacts);
+    item.setData(formattedContacts);
 
     m_clients.value(user)->sendPackage(item);
 }
