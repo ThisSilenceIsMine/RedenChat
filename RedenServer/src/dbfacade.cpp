@@ -63,14 +63,13 @@ void DBFacade::addMessage(QString sender, QString receiver, QString messageText)
     QSqlQuery query(*m_db);
 
     auto queryFailure = [](){
-            qWarning() << Q_FUNC_INFO << "Cannot execute query";
+        qWarning() << Q_FUNC_INFO << "Cannot execute query";
     };
 
-    query.prepare("SELECT :id"
-                  "FROM conversations"
-                  "WHERE (title = CONCAT(:name1, \"$\", :name2))"
-                  "OR"
-                  "(title = CONCAT(:name2, \"$\", :name1))");
+    query.prepare("SELECT id "
+                  "FROM conversations "
+                  "WHERE (title = CONCAT(:name1, \"$\", :name2)) "
+                  "OR (title = CONCAT(:name2, \"$\", :name1)) ");
     query.bindValue(":name1", sender);
     query.bindValue(":name2", receiver);
     int conversationId;
@@ -120,32 +119,34 @@ void DBFacade::addMessage(QString sender, QString receiver, QString messageText)
 QStringList DBFacade::messageHistory(QString user1, QString user2)
 {
     QSqlQuery query(*m_db);
-    QString messagesSelect = "SELECT u.name, m.created_at, m.message"
-                             "FROM messages AS m"
-                             "INNER JOIN users AS u"
-                             "ON u.id = m.id_sender"
-                             "WHERE id_conversation IN"
-                             "("
-                             "SELECT id "
-                             "FROM conversations"
-                             "WHERE (title = CONCAT(:name1, \"$\", :name2))"
-                             "OR"
-                             "(title = CONCAT(:name2, \"$\", :name1))"
-                             ")"
-                             "ORDER BY created_at ASC";
-    query.prepare(messagesSelect);
-    query.bindValue(":name1",user1);
-    query.bindValue(":name2",user2);
+
+    query.prepare(
+                "SELECT u.nickname, m.created_at, m.message "
+                "FROM messages m "
+                "INNER JOIN users u ON m.id_sender = u.id "
+                "INNER JOIN parritcipants p ON u.id = p.id_user "
+                "INNER JOIN conversations c ON p.id_conversation = c.id "
+                "WHERE ( (c.title LIKE CONCAT(:sender, '$', :receiver)) "
+                "OR (c.title LIKE CONCAT(:receiver, '$', :sender))) "
+                "ORDER BY m.created_at DESC"
+                );
+    query.bindValue(":sender",user1);
+    query.bindValue(":receiver",user2);
+    qDebug() << user1 << user2;
     bool ok = query.exec();
     if(!ok){
-        qWarning() << Q_FUNC_INFO << "Cannot execute messages select";
+        qWarning() << Q_FUNC_INFO << query.lastError();
     }
     QStringList messages;
+    qDebug() << query.size();
     while(query.next()) {
-        messages << query.value(0).toString() + net::Package::delimiter()
-                + query.value(1).toDateTime().toString() + net::Package::delimiter()
-                + query.value(2).toString();
+        messages.append(
+                    query.value(0).toString()                       + net::Package::delimiter() +
+                    query.value(1).toDateTime().time().toString()   + net::Package::delimiter() +
+                    query.value(2).toString()
+                    );
     }
+    qDebug() << messages.size();
     return messages;
 }
 
@@ -157,17 +158,17 @@ bool DBFacade::newConversation(const QString &user1, const QString &user2)
                   "SELECT CONCAT(:user1, \"$\", :user2), :null "
                   "WHERE"
                   "("
-                     "SELECT COUNT(*) "
-                     "FROM conversations "
-                     "WHERE "
-                     "(title = CONCAT(:user1, \"$\", :user2)) "
-                     "OR "
-                     "(title = CONCAT(:user2, \"$\", :user1))"
-                     ") = 0 "
+                  "SELECT COUNT(*) "
+                  "FROM conversations "
+                  "WHERE "
+                  "(title = CONCAT(:user1, \"$\", :user2)) "
+                  "OR "
+                  "(title = CONCAT(:user2, \"$\", :user1))"
+                  ") = 0 "
                   "AND "
-                     "(:user1 IN (SELECT nickname FROM users)) "
+                  "(:user1 IN (SELECT nickname FROM users)) "
                   "AND "
-                     "(:user2 IN (SELECT nickname FROM users)) ");
+                  "(:user2 IN (SELECT nickname FROM users)) ");
     query.bindValue(":user1", user1);
     query.bindValue(":user2",user2);
     query.bindValue(":null", QVariant());
@@ -234,17 +235,23 @@ QString DBFacade::userImage(QString username)
 
 void DBFacade::newMessage(const QString &sender, const QStringList &recievers, const QString &text, const QString &dateTime)
 {
-    QString insertMessageQuery =
-            "INSERT INTO messages (id_sender, id_conversation, message, created_at, deleted_at) "
-            "SELECT u.id, c.id, :text, :datetime, :deletedat"
-            "FROM users u "
-            "INNER JOIN parritcipants p ON u.id = p.id_user "
-            "INNER JOIN conversations c ON p.id_conversation = c.id "
-            "WHERE (c.title LIKE CONCAT(:sender, '$', :receiver)) "
-            "OR (c.title LIKE CONCAT(:receiver, '$', :sender)) "
-            "AND u.nickname = :sender";
+
     QSqlQuery query(*m_db);
-    query.prepare(insertMessageQuery);
+    query.prepare("INSERT INTO messages (id_sender, id_conversation, message, created_at, deleted_at) "
+                  "SELECT u.id, c.id, :text, :datetime, :deletedat "
+                  "FROM users u "
+                  "INNER JOIN parritcipants p ON u.id = p.id_user "
+                  "INNER JOIN conversations c ON p.id_conversation = c.id "
+                  "WHERE (u.nickname = :sender) "
+                  "AND "
+                  "("
+
+                  "(c.title LIKE CONCAT(:receiver, '$', :sender)) "
+                  "OR "
+                  "(c.title LIKE CONCAT(:sender, '$', :receiver)) "
+
+                  ")"
+                  );
     query.bindValue(":text", text);
     query.bindValue(":datetime", QDateTime::fromString(dateTime));
     query.bindValue(":deletedat", QVariant());

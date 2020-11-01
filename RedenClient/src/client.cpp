@@ -60,7 +60,6 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
 
     package.setData(avatarBase64);
 
-
     qDebug() << Q_FUNC_INFO << username << password << fixedUrl;
     qDebug() << Q_FUNC_INFO << package.data().toByteArray();
     m_connection.sendPackage(package);
@@ -83,7 +82,7 @@ void Client::sendMessage(QString text)
 {
     net::Package package;
     QString delim = net::Package::delimiter();
-    QString currentTime = QDateTime::currentDateTime().toString();
+    QString currentTime = QDateTime::currentDateTime().time().toString();
     package.setType(net::Package::DataType::TEXT_MESSAGE);
     package.setSender(m_user->username());
     package.setDestinations({m_contactsModel->currentDialog()});
@@ -140,6 +139,7 @@ void Client::getMessageHistory(int idx)
 {
     Q_UNUSED(idx) //Лень менять
     QString user = m_contactsModel->currentDialog();
+    qDebug() << "Getting meesage jistory with user = " << user;
     net::Package package;
     package.setSender(m_user->username());
     package.setDestinations({user});
@@ -191,19 +191,19 @@ void Client::addContact(const QString &contactData)
 
 void Client::newMessage(QString sender, QString time, QString text)
 {
-    if(sender == m_contactsModel->currentDialog() || sender == m_user->username())
+//    if(sender == m_contactsModel->currentDialog() || sender == m_user->username())
 //    if(sender == QLatin1String("Dias") || sender == m_user->username())
-    {
+//    {
         Message item;
         item.sender = sender;
         item.data = text;
         item.timeStamp = time;
         m_messagesModel->append(item);
-    }
-    else
-    {
-        //Уведомить о новом сообщении из другого диалога
-    }
+//    }
+//    else
+//    {
+//        //Уведомить о новом сообщении из другого диалога
+//    }
 
 }
 

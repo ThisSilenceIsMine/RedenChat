@@ -99,6 +99,7 @@ ListView
     Component.onCompleted:
     {
         selectedChanged.connect(contactsModel.indexChanged)
+//        list.currentIndex = 0
     }
 
     //onCurrentItemChanged: console.log(model.get(list.currentIndex).nickname + ' selected')
