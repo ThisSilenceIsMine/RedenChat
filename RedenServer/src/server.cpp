@@ -72,9 +72,8 @@ void Server::registerUser(net::Package package, net::Connection *connection)
             + QLatin1String("/images/")
             //+ QDir::separator()
             + username + "_avatar.png";
-    QByteArray imgRaw = QByteArray::fromBase64(package.data().toByteArray());
 
-    ImageSerializer::fromBase64(imgRaw,path);
+    ImageSerializer::fromBase64(package.data().toByteArray(),path);
 
     //Отправляем клиенту результат регистрации
     net::Package responce;

@@ -162,6 +162,7 @@ void MessagesModel::append(const Message &item)
     }
     bool ok = 0;
 
+    qDebug() << item.sender << item.data;
 //    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.sender), Roles::SenderRole);
 //    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.data), Roles::TextRole);
 //    ok |= setData(this->index(this->rowCount({}) - 1), QVariant(item.timeStamp), Roles::TimeRole);

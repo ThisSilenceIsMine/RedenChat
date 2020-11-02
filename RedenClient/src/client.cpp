@@ -38,25 +38,25 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     package.setSender(username);
     package.setType(net::Package::DataType::REGISTRATION_REQUEST);
     package.setDestinations({password});
-    bool ok = false;
+//    bool ok = false;
 
-    QImage avatar;
-    ok = avatar.load(fixedUrl);
-    if(!ok)
-    {
-        qDebug() << Q_FUNC_INFO << "Can't load image from " << fixedUrl;
-    }
-    QByteArray imgRaw;
-    QBuffer buff(&imgRaw);
+//    QImage avatar;
+//    ok = avatar.load(fixedUrl);
+//    if(!ok)
+//    {
+//        qDebug() << Q_FUNC_INFO << "Can't load image from " << fixedUrl;
+//    }
+//    QByteArray imgRaw;
+//    QBuffer buff(&imgRaw);
 
-    buff.open(QIODevice::WriteOnly | QIODevice::Truncate);
-    ok = avatar.save(&buff, "PNG");
-    if(!ok)
-    {
-        qDebug() << "Can't save image to buffer";
-    }
-    buff.close();
-    QString avatarBase64 = imgRaw.toBase64();
+//    buff.open(QIODevice::WriteOnly | QIODevice::Truncate);
+//    ok = avatar.save(&buff, "PNG");
+//    if(!ok)
+//    {
+//        qDebug() << "Can't save image to buffer";
+//    }
+//    buff.close();
+    QString avatarBase64 = ImageSerializer::toBase64(fixedUrl);
 
     package.setData(avatarBase64);
 
@@ -105,13 +105,14 @@ void Client::sendImage(QString url, QString reciver)
     package.setSender(m_user->username());
     package.setDestinations({reciver});
 
-    QImage image;
-    image.load(url);
-    QByteArray imgRaw;
-    QBuffer buff(&imgRaw);
+//    QImage image;
+//    image.load(url);
+//    QByteArray imgRaw;
+//    QBuffer buff(&imgRaw);
 
-    image.save(&buff);
-    QByteArray imageBase64 = imgRaw.toBase64();
+//    image.save(&buff);
+//    QByteArray imageBase64 = imgRaw.toBase64();
+    QByteArray imageBase64 = ImageSerializer::toBase64(url);
     package.setData(imageBase64);
 
 
@@ -254,23 +255,24 @@ void Client::authorize(QString username, QByteArray base64)
             //+ QDir::separator()
             + username + "_avatar.png";
 
-    QImage avatar;
+//    QImage avatar;
 
-    QFile file{path};
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        qDebug() << Q_FUNC_INFO << "Can't create file";
-    }
-    if(!avatar.loadFromData(QByteArray::fromBase64(base64)))
-    {
-        qDebug() << Q_FUNC_INFO << " Can't load image from base64";
-    }
-    if(!avatar.save(&file, "PNG"))
-    {
-        qDebug() << Q_FUNC_INFO << " Can't save image to file";
-    }
+//    QFile file{path};
+//    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//    {
+//        qDebug() << Q_FUNC_INFO << "Can't create file";
+//    }
+//    if(!avatar.loadFromData(QByteArray::fromBase64(base64)))
+//    {
+//        qDebug() << Q_FUNC_INFO << " Can't load image from base64";
+//    }
+//    if(!avatar.save(&file, "PNG"))
+//    {
+//        qDebug() << Q_FUNC_INFO << " Can't save image to file";
+//    }
 
-    file.close();
+//    file.close();
+    ImageSerializer::fromBase64(base64,path);
     m_user->setUsername(username);
     m_user->setImageUrl(path);
 }
