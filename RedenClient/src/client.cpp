@@ -38,24 +38,6 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     package.setSender(username);
     package.setType(net::Package::DataType::REGISTRATION_REQUEST);
     package.setDestinations({password});
-//    bool ok = false;
-
-//    QImage avatar;
-//    ok = avatar.load(fixedUrl);
-//    if(!ok)
-//    {
-//        qDebug() << Q_FUNC_INFO << "Can't load image from " << fixedUrl;
-//    }
-//    QByteArray imgRaw;
-//    QBuffer buff(&imgRaw);
-
-//    buff.open(QIODevice::WriteOnly | QIODevice::Truncate);
-//    ok = avatar.save(&buff, "PNG");
-//    if(!ok)
-//    {
-//        qDebug() << "Can't save image to buffer";
-//    }
-//    buff.close();
     QString avatarBase64 = ImageSerializer::toBase64(fixedUrl);
 
     package.setData(avatarBase64);
@@ -82,7 +64,7 @@ void Client::sendMessage(QString text)
 {
     net::Package package;
     QString delim = net::Package::delimiter();
-    QString currentTime = QDateTime::currentDateTime().time().toString();
+    QString currentTime = QDateTime::currentDateTime().toString();
     package.setType(net::Package::DataType::TEXT_MESSAGE);
     package.setSender(m_user->username());
     package.setDestinations({m_contactsModel->currentDialog()});
@@ -285,6 +267,11 @@ UserData *Client::getUser() const
 void Client::setUser(UserData *user)
 {
     m_user = user;
+}
+
+QString Client::username() const
+{
+    return m_user->username();
 }
 
 void Client::start()

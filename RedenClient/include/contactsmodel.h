@@ -22,7 +22,8 @@ public:
     void setList(ContactsList *list);
     void append(const Contact &item);
     int currentIndex() const;
-    QString currentDialog() const;
+    Q_INVOKABLE QString currentDialog() const;
+    Q_INVOKABLE QString currentAvatar() const;
     // QAbstractItemModel interface
 public:
     int rowCount(const QModelIndex &parent) const override;

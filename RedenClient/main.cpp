@@ -49,33 +49,8 @@ int main(int argc, char *argv[])
 
     client.start();
 
-//    QString fileUrl = QDir::currentPath() + "/Contacts.json";
-//    QFile file(fileUrl);
-//    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-//    {
-
-//        QJsonDocument js = QJsonDocument::fromJson(file.readAll());
-
-//        file.close();
-//        QJsonArray arr = js["data"].toVariant().toJsonArray();
-
-//        client.loadContactsList(arr);
-
-//    }
-
-//    QString msgUrl = QDir::currentPath() + "/Messages.json";
-//    QFile msgFile(msgUrl);
-//    if(msgFile.open(QIODevice::ReadOnly | QIODevice::Text))
-//    {
-//        QJsonDocument js = QJsonDocument::fromJson(msgFile.readAll());
-
-//        msgFile.close();
-//        QJsonArray arr = js["data"].toVariant().toJsonArray();
-//        client.loadMessageHistory(arr);
-//    }
     QQmlApplicationEngine engine;
-
-    //qmlRegisterUncreatableType<ContactsList>("reden.models.contactsList",1,0,"ContactsList",QStringLiteral("ContactsList cannot be created in QML"));
+    engine.rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
     qmlRegisterType<ContactsModel>("reden.models.contactsModel",1,0,"ContactsModel");
     qmlRegisterType<MessagesModel>("reden.models.messagesModel",1,0,"MessagesModel");
     qmlRegisterType<Client>("reden.net.client",1,0,"Client");

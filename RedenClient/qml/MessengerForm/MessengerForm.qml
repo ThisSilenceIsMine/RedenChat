@@ -83,7 +83,10 @@ Rectangle
                         time: model.timeStamp
                         username: model.nickname
                         message: model.text
-                        avatarSource: "qrc:/qml/Images/Default"//model.avatar
+                        avatarSource: model.nickname == contactsModel.currentDialog() ?
+                                          Qt.resolvedUrl("file:///" + contactsModel.currentAvatar())
+                                        : Qt.resolvedUrl("file:///" + applicationDirPath + "/../images/" + client.username() + "_avatar.png")
+                                          //"qrc:/qml/Images/Default"//model.avatar
                         ListView.onAdd:
                         {
                             messagesView.positionViewAtBeginning()

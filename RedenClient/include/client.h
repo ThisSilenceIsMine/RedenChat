@@ -35,6 +35,8 @@ public:
     UserData *getUser() const;
     void setUser(UserData *user);
 
+    Q_INVOKABLE QString username() const;
+
     void start();
 public slots:
     void registerNewUser(QString username, QString password, QString imgUrl);

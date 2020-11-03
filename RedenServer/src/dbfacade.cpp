@@ -131,23 +131,31 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
 //                "ORDER BY m.created_at DESC"
 //                );
     query.prepare(
-                  "SELECT u.nickname, m.created_at, m.message "
-                  "FROM messages m "
-                  "INNER JOIN users u ON m.id_sender = u.id "
-                  "INNER JOIN parritcipants p ON u.id = p.id_user "
-                  "INNER JOIN conversations c ON p.id_conversation = c.id "
-                  "WHERE "
-                      "(u.nickname = :sender) "
-                  "AND c.id IN "
-                      "( "
-                      "SELECT c.id "
-                      "FROM conversations c "
-                      "INNER JOIN parritcipants p ON c.id = p.id_conversation "
-                      "INNER JOIN users u ON p.id_user = u.id "
-                      "WHERE (u.nickname = :receiver) "
-                      ") "
-                  "ORDER BY m.created_at DESC;"
-                  );
+                "SELECT u.nickname, m.created_at, m.message "
+                "FROM messages m "
+                "INNER JOIN users u ON m.id_sender = u.id "
+                "INNER JOIN parritcipants p ON u.id = p.id_user "
+                "INNER JOIN conversations c ON p.id_conversation = c.id "
+                "WHERE ( "
+                              "(u.nickname = :sender) "
+                              "AND c.id IN "
+                                  "( "
+                                      "SELECT c.id "
+                                      "FROM conversations c "
+                                               "INNER JOIN parritcipants p ON c.id = p.id_conversation "
+                                               "INNER JOIN users u ON p.id_user = u.id "
+                                      "WHERE (u.nickname = :receiver) "
+                                  ") "
+                          ") "
+                "OR (u.nickname = :receiver AND c.id IN "
+                                  "( "
+                                      "SELECT c.id "
+                                      "FROM conversations c "
+                                               "INNER JOIN parritcipants p ON c.id = p.id_conversation "
+                                               "INNER JOIN users u ON p.id_user = u.id "
+                                      "WHERE (u.nickname = :sender) "
+                                  ")) "
+                "ORDER BY m.created_at ASC ");
     query.bindValue(":sender",user1);
     query.bindValue(":receiver",user2);
     qDebug() << user1 << user2;
@@ -260,14 +268,12 @@ void DBFacade::newMessage(const QString &sender, const QStringList &recievers, c
                   "FROM users u "
                   "INNER JOIN parritcipants p ON u.id = p.id_user "
                   "INNER JOIN conversations c ON p.id_conversation = c.id "
-                  "WHERE (u.nickname = :sender OR u.nickname = :receiver) "
+                  "WHERE (u.nickname = :sender) "
                   "AND "
                   "("
-
                   "(c.title LIKE CONCAT(:receiver, '$', :sender)) "
                   "OR "
                   "(c.title LIKE CONCAT(:sender, '$', :receiver)) "
-
                   ")"
                   );
     query.bindValue(":text", text);

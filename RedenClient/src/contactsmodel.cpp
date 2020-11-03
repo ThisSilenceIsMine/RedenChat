@@ -22,6 +22,11 @@ QString ContactsModel::currentDialog() const
     return data(this->index(currentIndex()),Roles::NicknameRole).toString();
 }
 
+QString ContactsModel::currentAvatar() const
+{
+    return data(this->index(currentIndex()),Roles::ImageRole).toString();
+}
+
 ContactsModel::ContactsModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_list(nullptr)
