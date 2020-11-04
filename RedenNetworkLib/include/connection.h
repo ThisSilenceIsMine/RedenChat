@@ -42,10 +42,10 @@ public slots:
 signals:
     void readyForUse();
     void newPackage(const Package &package);
+    void disconnected();
 
 private slots:
     void connected();
-    void disconnected();
     void error(QAbstractSocket::SocketError socketError);
     void stateChanged(QAbstractSocket::SocketState socketState);
     void readyRead();

@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
     fontDB.addApplicationFont("qrc:/qml/fonts/OpenSansEmoji.ttf");
     app.setFont(QFont(QStringLiteral("OpenSansEmoji")));
 
-
     ContactsList contactsList;
     ContactsModel contactsModel;
     contactsModel.setList(&contactsList);
@@ -45,9 +44,21 @@ int main(int argc, char *argv[])
     client.setMessagesModel(&messagesModel);
 
     UserData user;
-    client.setUser(&user);
+    client.setUser(&user);  
 
-    client.start();
+//    QFile conf("config.json");
+//    QByteArray configBytes;
+//    if(!conf.open(QIODevice::ReadOnly))
+        client.start();
+//    else {
+//        qDebug() << "Getting settings from config.json...";
+//        QJsonParseError err;
+//        QJsonDocument config = QJsonDocument::fromJson(conf.readAll(), &err);
+//        qDebug() << err.errorString();
+//        QString hostAdress = config["host_adress"].toString();
+//        quint16 port = quint16(config["port"].toInt());
+//        client.start(hostAdress,port);
+//    }
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());

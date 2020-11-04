@@ -27,6 +27,7 @@ public:
     void start();
 private slots:
     void newConnection();
+    void disconnected();
     void newPackage(const net::Package &package);
 
     void registerUser(net::Package package, net::Connection *connection);
@@ -35,6 +36,7 @@ private slots:
     void sendContactsList(QString user);
     void sendMessage(const net::Package &package);
     void newConversation(const QString &user1, const QString &user2);
+
 private:
     void sendContact(const QString &to, const QString &other);
 

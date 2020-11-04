@@ -73,7 +73,7 @@ Rectangle
                     anchors.leftMargin: 5
                     anchors.rightMargin: 5
                     model: messagesModel
-                    spacing: 75
+                    spacing: 25//75
 
 //                    clip: true
                     verticalLayoutDirection: ListView.BottomToTop

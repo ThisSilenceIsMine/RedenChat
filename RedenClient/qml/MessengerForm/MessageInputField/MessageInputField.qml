@@ -86,6 +86,7 @@ Rectangle
             {
                 property var accent: Material.color(Material.DeepOrange)
                 id: textArea
+
                 font.family: emojiFont.name
                 font.pointSize: 16
                 selectionColor: Material.color(Material.LightBlue)
@@ -165,6 +166,7 @@ Rectangle
                     sendHighlight.run()
                     client.sendMessage(textArea.text)
                     messageSent()
+                    textArea.text = ""
                     }
                 }
             }

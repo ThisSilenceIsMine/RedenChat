@@ -7,7 +7,7 @@ import QtGraphicalEffects 1.0
 import GlobalQmlSettings 1.0
 import MessengerForm.RoundImage 1.0
 
-Rectangle
+ColumnLayout
 {
     id: root
 

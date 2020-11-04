@@ -18,7 +18,16 @@ void Server::newConnection()
     connection->setSocket(socket);
 
     qInfo() << "Connected" << socket->socketDescriptor();
-    qInfo() << connect(connection, &net::Connection::newPackage, this, &Server::newPackage);
+    connect(connection, &net::Connection::newPackage, this, &Server::newPackage);
+    connect(connection, &net::Connection::disconnected, this, &Server::disconnected);
+}
+
+void Server::disconnected()
+{
+    net::Connection *connection = qobject_cast<net::Connection *>(sender());
+    QString toDelete = m_clients.key(connection);
+    connection->deleteLater();
+    m_clients.remove(toDelete);
 }
 
 void Server::newPackage(const net::Package &package)
