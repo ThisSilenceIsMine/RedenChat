@@ -91,10 +91,14 @@ Rectangle
                 font.pointSize: 16
                 selectionColor: Material.color(Material.LightBlue)
                 selectedTextColor: "white"
-                wrapMode: Text.WordWrap
+                wrapMode: TextEdit.Wrap
                 Material.accent: accent
-                text: "☺"
                 placeholderText: qsTr("Написать сообщение...")
+                onTextChanged: {
+                    if(textArea.text.length >= 500) {
+                        textArea.text = textArea.text.substring(0,500)
+                    }
+                }
             }
 
         }

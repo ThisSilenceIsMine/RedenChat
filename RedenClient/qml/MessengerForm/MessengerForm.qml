@@ -75,7 +75,6 @@ Rectangle
                     model: messagesModel
                     spacing: 25//75
 
-//                    clip: true
                     verticalLayoutDirection: ListView.BottomToTop
                     delegate: MessagesDelegate
                     {
@@ -90,7 +89,6 @@ Rectangle
                         ListView.onAdd:
                         {
                             messagesView.positionViewAtBeginning()
-                            console.log("goin to beginning")
                         }
                     }
                 }

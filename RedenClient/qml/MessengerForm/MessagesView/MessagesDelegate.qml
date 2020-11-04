@@ -7,82 +7,68 @@ import QtGraphicalEffects 1.0
 import GlobalQmlSettings 1.0
 import MessengerForm.RoundImage 1.0
 
-ColumnLayout
+RowLayout
 {
-    id: root
+    id: rowLayout
 
-    //property alias imageSource: optionalContentImage.source
     property string avatarSource
     property string username
     property string time
     property string message
-//    height: rowLayout.height + 21
-//    Rectangle
-//    {
-//        id: delimiter
-//        height: 1
-//        width: rowLayout.width
-//        color: Qt.lighter(Material.backgroundColor)
-//        anchors.bottom: rowLayout.top
-//        anchors.bottomMargin: 20
-//    }
 
-    RowLayout
+    spacing: 10
+    RoundImage
     {
-        id: rowLayout
-        spacing: 10
-        anchors.fill: parent
-        RoundImage
-        {
-            id: avatar
-            source: avatarSource
-            Layout.preferredWidth: 40
-            Layout.preferredHeight: 40
-            Layout.alignment: Qt.AlignLeft
-        }
+        id: icon
+        source: avatarSource
+        Layout.preferredWidth: 40
+        Layout.preferredHeight: 40
+        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+    }
 
+    ColumnLayout
+    {
         Item
         {
             id: messageContent
 
-            //anchors.left: avatar.right
-
-            //anchors.leftMargin: 5
-            //Layout.fillWidth: true
-
-            Layout.alignment: Qt.AlignLeft
+            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
             Layout.leftMargin: 5
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            //Layout.leftMargin: 5
-            Label
+            //            Layout.fillHeight: true
+            RowLayout
             {
-                id: senderNickname
-                anchors.top: parent.top
-                anchors.left: parent.left
-                text: username
+                Label
+                {
+                    id: senderNickname
+                    //            anchors.top: parent.top
+                    //            anchors.left: parent.left
+                    Layout.alignment: Qt.AlignTop | Qt.AlignLeft
+                    text: username
+                }
+                Label
+                {
+                    id: timeSpan
+                    //            anchors.top: parent.top
+                    //            anchors.left: senderNickname.right
+                    //            anchors.leftMargin: 15
+                    Layout.alignment: Qt.AlignTop | Qt.AlignLeft
+                    text: time
+                }
             }
-            Label
-            {
-                id: timeSpan
-                anchors.top: parent.top
-                anchors.left: senderNickname.right
-                anchors.leftMargin: 15
-                text: time
-            }
-            Text
-            {
-                id: messageText
-                anchors.fill: parent
-                anchors.topMargin: (timeSpan.height + senderNickname.height) / 1.5
-                color: "#ffffff"
-                text: message
-                wrapMode: Text.Wrap
-            }
-            Image
-            {
-                id: optionalContentImage
-            }
+        }
+        Label
+        {
+
+            id: messageText
+            //            anchors.fill: parent
+            //            anchors.topMargin: (timeSpan.height + senderNickname.height) / 1.5
+            text: message
+            wrapMode: Text.Wrap
+            height: contentHeight
+            width: rowLayout.width - icon.width
+            Layout.topMargin: senderNickname.contentHeight
         }
     }
 }
+
