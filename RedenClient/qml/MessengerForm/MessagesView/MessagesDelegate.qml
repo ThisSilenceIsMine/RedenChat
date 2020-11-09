@@ -35,23 +35,19 @@ RowLayout
             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
             Layout.leftMargin: 5
             Layout.fillWidth: true
-            //            Layout.fillHeight: true
             RowLayout
             {
                 Label
                 {
                     id: senderNickname
-                    //            anchors.top: parent.top
-                    //            anchors.left: parent.left
+
                     Layout.alignment: Qt.AlignTop | Qt.AlignLeft
                     text: username
                 }
                 Label
                 {
                     id: timeSpan
-                    //            anchors.top: parent.top
-                    //            anchors.left: senderNickname.right
-                    //            anchors.leftMargin: 15
+
                     Layout.alignment: Qt.AlignTop | Qt.AlignLeft
                     text: time
                 }
@@ -61,12 +57,10 @@ RowLayout
         {
 
             id: messageText
-            //            anchors.fill: parent
-            //            anchors.topMargin: (timeSpan.height + senderNickname.height) / 1.5
             text: message
-            wrapMode: Text.Wrap
-            height: contentHeight
-            width: rowLayout.width - icon.width
+            wrapMode: Text.WordWrap
+            Layout.preferredHeight: contentHeight
+            Layout.preferredWidth: rowLayout.width - icon.width
             Layout.topMargin: senderNickname.contentHeight
         }
     }

@@ -87,13 +87,13 @@ void Client::sendImage(QString url, QString reciver)
     package.setSender(m_user->username());
     package.setDestinations({reciver});
 
-//    QImage image;
-//    image.load(url);
-//    QByteArray imgRaw;
-//    QBuffer buff(&imgRaw);
+    //    QImage image;
+    //    image.load(url);
+    //    QByteArray imgRaw;
+    //    QBuffer buff(&imgRaw);
 
-//    image.save(&buff);
-//    QByteArray imageBase64 = imgRaw.toBase64();
+    //    image.save(&buff);
+    //    QByteArray imageBase64 = imgRaw.toBase64();
     QByteArray imageBase64 = ImageSerializer::toBase64(url);
     package.setData(imageBase64);
 
@@ -121,7 +121,13 @@ void Client::getContactsList()
 void Client::getMessageHistory(int idx)
 {
     Q_UNUSED(idx) //Лень менять
+    static QString lastSelect;
     QString user = m_contactsModel->currentDialog();
+    if(lastSelect == user) {
+        return;
+    } else {
+        lastSelect = user;
+    }
     qDebug() << "Getting meesage jistory with user = " << user;
     net::Package package;
     package.setSender(m_user->username());
@@ -167,26 +173,31 @@ void Client::addContact(const QString &contactData)
     QImage avatar;
     QByteArray imgRaw = data.last().toLocal8Bit();
 
-    ImageSerializer::fromBase64(imgRaw,path);
+    qDebug() << data;
 
+    ImageSerializer::fromBase64(imgRaw,path);
     contactsModel()->append(item);
+
+    if(data.count() == 3)
+        if(data.at(1).toInt() == 1) {
+            m_toNotify << data.first();
+        }
 }
 
 void Client::newMessage(QString sender, QString time, QString text)
 {
-//    if(sender == m_contactsModel->currentDialog() || sender == m_user->username())
-//    if(sender == QLatin1String("Dias") || sender == m_user->username())
-//    {
+    if(sender == m_contactsModel->currentDialog() || sender == m_user->username())
+    {
         Message item;
         item.sender = sender;
         item.data = text;
         item.timeStamp = time;
         m_messagesModel->append(item);
-//    }
-//    else
-//    {
-//        //Уведомить о новом сообщении из другого диалога
-//    }
+    }
+    else
+    {
+        emit notifyMessage(sender);
+    }
 
 }
 
@@ -228,6 +239,12 @@ void Client::requestContact(QString username)
     m_connection.sendPackage(item);
 }
 
+void Client::qmlNotifyUnreadMessage(QString sender)
+{
+    if(m_toNotify.contains(sender))
+        emit notifyMessage(sender);
+}
+
 void Client::authorize(QString username, QByteArray base64)
 {
 
@@ -237,23 +254,6 @@ void Client::authorize(QString username, QByteArray base64)
             //+ QDir::separator()
             + username + "_avatar.png";
 
-//    QImage avatar;
-
-//    QFile file{path};
-//    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-//    {
-//        qDebug() << Q_FUNC_INFO << "Can't create file";
-//    }
-//    if(!avatar.loadFromData(QByteArray::fromBase64(base64)))
-//    {
-//        qDebug() << Q_FUNC_INFO << " Can't load image from base64";
-//    }
-//    if(!avatar.save(&file, "PNG"))
-//    {
-//        qDebug() << Q_FUNC_INFO << " Can't save image to file";
-//    }
-
-//    file.close();
     ImageSerializer::fromBase64(base64,path);
     m_user->setUsername(username);
     m_user->setImageUrl(path);
@@ -284,6 +284,7 @@ void Client::start()
 void Client::start(QString hostIp, quint16 port)
 {
     m_connection.createSocket();
+    qDebug() << "Connecting to " << hostIp << port;
     m_connection.connectToHost(hostIp, port);
     qDebug() << "Client started on " << hostIp << port;
 }
@@ -322,7 +323,7 @@ void Client::packageRecieved(net::Package package)
     switch(package.type())
     {
     case net::Package::CONTACTS_LIST:
-        qDebug() << package.data();
+        //qDebug() << package.data();
 
         loadContactsList(package.data().toStringList());
         break;

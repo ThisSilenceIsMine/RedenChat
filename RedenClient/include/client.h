@@ -54,6 +54,8 @@ public slots:
     void loadMessageHistory(const QStringList &json);
 
     void requestContact(QString username);
+
+    void qmlNotifyUnreadMessage(QString sender);
 private slots:
     void packageRecieved(net::Package package);
 signals:
@@ -62,6 +64,8 @@ signals:
 
     void authSuccsess();
     void authFailure();
+
+    void notifyMessage(QString sender);
 private:
     void addContact(const QString &contactData);
     void addMessage(QString);
@@ -76,6 +80,7 @@ private:
     net::Connection m_connection;
     ContactsModel *m_contactsModel;
     MessagesModel *m_messagesModel;
+    QStringList m_toNotify;
 };
 
 #endif // CLIENT_H

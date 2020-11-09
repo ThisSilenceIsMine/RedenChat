@@ -10,8 +10,6 @@ import Authentication.LoginForm 1.0
 import Authentication.RegisterForm 1.0
 import MessengerForm 1.0
 
-import reden.models.contactsModel 1.0
-
 ApplicationWindow {
     id:root
     property int bw: 5

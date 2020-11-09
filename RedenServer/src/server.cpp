@@ -218,7 +218,7 @@ void Server::setDatabase(DBFacade *database)
 
 void Server::start()
 {
-    if(m_server.listen(QHostAddress::Any, 52484))
+    if(m_server.listen(QHostAddress("26.114.206.167"), 52484))
         qInfo() << "Listening on " << m_server.serverAddress().toString() << ":" << m_server.serverPort();
     else
         qInfo() << "Server not started!";

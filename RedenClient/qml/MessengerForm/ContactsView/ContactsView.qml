@@ -64,6 +64,7 @@ ListView
             border.width: 2
             border.color: Material.color(Material.DeepOrange)
             z: 5
+            visible: false
             Behavior on y
             {
                 PropertyAnimation
@@ -83,27 +84,30 @@ ListView
         avatarSource: model.avatar
         username: model.nickname
         z: 3
-        //        MouseArea
-        //        {
-        //            anchors.fill: parent
-        //            //z: 10
-        //            onClicked: {
-        //                list.currentIndex = index
-        //                console.log("selected delegate #" + index)
-        //            }
-        //        }
         onClick: {
             list.currentIndex = index
             console.log("selected delegate #" + index)
             selectedChanged(index)
+
+        }
+
+        Connections{
+            target: client
+            function onNotifyMessage(sender)
+            {
+                console.log("Notifying on " + sender)
+                if(sender === model.nickname)
+                    notify()
+            }
+            Component.onCompleted: {
+                client.qmlNotifyUnreadMessage(model.nickname)
+            }
         }
     }
     Component.onCompleted:
     {
         selectedChanged.connect(contactsModel.indexChanged)
-//        list.currentIndex = 0
+        //        list.currentIndex = 0
     }
-
-    //onCurrentItemChanged: console.log(model.get(list.currentIndex).nickname + ' selected')
 
 }

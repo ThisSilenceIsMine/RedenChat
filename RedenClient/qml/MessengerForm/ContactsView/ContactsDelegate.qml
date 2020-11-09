@@ -12,9 +12,14 @@ Rectangle
     id: root
     property string avatarSource
     property string username
-    //implicitHeight: rowLayout.height
+
     height: 50
     signal click()
+    function notify() {
+        notification.visible = true
+        console.log("Should be visible")
+    }
+
     color: Material.backgroundColor
     Rectangle
     {
@@ -22,8 +27,8 @@ Rectangle
         height: 1
         width: rowLayout.width
         color: Qt.lighter(Material.backgroundColor)
-        anchors.bottom: rowLayout.top
-        anchors.bottomMargin: 10
+        anchors.top: rowLayout.bottom
+//        anchors.bottomMargin: 10
     }
     RowLayout
     {
@@ -45,8 +50,20 @@ Rectangle
         {
             id: usernameLabel
             text: username
+            Layout.preferredHeight: contentHeight
+//            Layout.preferredWidth: rowLayout.width - avatar.width
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
+        }
+        Rectangle{
+            id: notification
+            color: Material.color(Material.Orange)
+            radius: 10
+            visible: false
+            Layout.preferredHeight: 10
+            Layout.preferredWidth: 10
+            Layout.rightMargin: 20
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
         }
     }
     MouseArea
@@ -54,7 +71,9 @@ Rectangle
         id: area
         anchors.fill: parent
         z: 5
-
+        onClicked: {
+            notification.visible = false
+        }
     }
     Component.onCompleted: {
         area.clicked.connect(click)

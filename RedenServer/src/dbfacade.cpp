@@ -119,7 +119,7 @@ void DBFacade::addMessage(QString sender, QString receiver, QString messageText)
 QStringList DBFacade::messageHistory(QString user1, QString user2)
 {
     QSqlQuery query(*m_db);
-    qDebug() << "Gettin meesageHistroy for" << user1 << user2;
+//    qDebug() << "Gettin meesageHistroy for" << user1 << user2;
 //    query.prepare(
 //                "SELECT u.nickname, m.created_at, m.message "
 //                "FROM messages m "
@@ -134,30 +134,21 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
                 "SELECT u.nickname, m.created_at, m.message "
                 "FROM messages m "
                 "INNER JOIN users u ON m.id_sender = u.id "
-                "INNER JOIN parritcipants p ON u.id = p.id_user "
-                "INNER JOIN conversations c ON p.id_conversation = c.id "
-                "WHERE ( "
-                              "(u.nickname = :sender) "
-                              "AND c.id IN "
-                                  "( "
-                                      "SELECT c.id "
-                                      "FROM conversations c "
-                                               "INNER JOIN parritcipants p ON c.id = p.id_conversation "
-                                               "INNER JOIN users u ON p.id_user = u.id "
-                                      "WHERE (u.nickname = :receiver) "
-                                  ") "
+                "WHERE (m.id_conversation IN ( "
+                    "SELECT p.id_conversation "
+                    "FROM parritcipants p "
+                             "INNER JOIN users u ON p.id_user = u.id "
+                    "WHERE (u.nickname = :user1 AND p.id_conversation IN ( "
+                        "SELECT p2.id_conversation "
+                        "FROM parritcipants p2 "
+                                 "INNER JOIN users u2 ON p2.id_user = u2.id "
+                        "WHERE (u2.nickname = :user2) "
+                    ") "
+                              ")) "
                           ") "
-                "OR (u.nickname = :receiver AND c.id IN "
-                                  "( "
-                                      "SELECT c.id "
-                                      "FROM conversations c "
-                                               "INNER JOIN parritcipants p ON c.id = p.id_conversation "
-                                               "INNER JOIN users u ON p.id_user = u.id "
-                                      "WHERE (u.nickname = :sender) "
-                                  ")) "
-                "ORDER BY m.created_at ASC ");
-    query.bindValue(":sender",user1);
-    query.bindValue(":receiver",user2);
+                "ORDER BY m.created_at");
+    query.bindValue(":user1",user1);
+    query.bindValue(":user2",user2);
     qDebug() << user1 << user2;
     bool ok = query.exec();
     if(!ok){
@@ -173,6 +164,32 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
                     );
     }
     qDebug() << messages.size();
+    query.finish();
+    query.prepare(
+                  "UPDATE messages m "
+                  "INNER JOIN conversations c ON m.id_conversation = c.id "
+                  "INNER JOIN parritcipants p ON c.id = p.id_conversation "
+                  "INNER JOIN users u ON p.id_user = u.id "
+              "SET m.isRead = TRUE "
+              "WHERE (m.isRead = FALSE "
+                  "AND m.id_conversation IN ( "
+                  "SELECT p.id_conversation "
+                  "FROM parritcipants p "
+                           "INNER JOIN users u ON p.id_user = u.id "
+                  "WHERE (u.nickname = :user1 AND p.id_conversation IN ( "
+                      "SELECT p2.id_conversation "
+                      "FROM parritcipants p2 "
+                               "INNER JOIN users u2 ON p2.id_user = u2.id "
+                      "WHERE (u2.nickname = :user2) "
+                  ") "
+                            ")) "
+                  "AND u.nickname = :user2 "
+                        ")");
+    query.bindValue(":user1", user1);
+    query.bindValue(":user2", user2);
+    if(!query.exec()) {
+        qDebug() << Q_FUNC_INFO << "Can't update messages!";
+    }
     return messages;
 }
 
@@ -270,18 +287,18 @@ void DBFacade::newMessage(const QString &sender, const QStringList &recievers, c
                   "INNER JOIN conversations c ON p.id_conversation = c.id "
                   "WHERE (u.nickname = :sender) "
                   "AND "
-                  "("
+                  "( "
                   "(c.title LIKE CONCAT(:receiver, '$', :sender)) "
                   "OR "
                   "(c.title LIKE CONCAT(:sender, '$', :receiver)) "
-                  ")"
+                  ") "
                   );
     query.bindValue(":text", text);
     query.bindValue(":datetime", QDateTime::fromString(dateTime));
     query.bindValue(":deletedat", QVariant());
     query.bindValue(":sender", sender);
     query.bindValue(":receiver", recievers.first());
-
+    qDebug() << text << sender << recievers.first();
     bool ok = query.exec();
     if(!ok) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -291,24 +308,43 @@ void DBFacade::newMessage(const QString &sender, const QStringList &recievers, c
 QHash<QString, QString> DBFacade::contactsList(QString user)
 {
     QSqlQuery query(*m_db);
+//    QString queryString =
+//            "SELECT u.nickname, a.url "
+//            "FROM users u "
+//            "INNER JOIN attachments a ON a.id = u.id_picture "
+//            "INNER JOIN parritcipants p ON u.id = p.id_user "
+//            "INNER JOIN conversations c ON p.id_conversation = c.id "
+//            "WHERE u.nickname != :username";
     QString queryString =
-            "SELECT u.nickname, a.url "
+            "SELECT DISTINCT u.nickname, a.url, HasUnreadMessages(:username, u.nickname) "
             "FROM users u "
             "INNER JOIN attachments a ON a.id = u.id_picture "
             "INNER JOIN parritcipants p ON u.id = p.id_user "
             "INNER JOIN conversations c ON p.id_conversation = c.id "
-            "WHERE u.nickname != :username";
-    query.prepare(queryString);
+            "WHERE (u.nickname != :username "
+            "AND c.id IN ( "
+                "SELECT c2.id "
+                "FROM conversations c2 "
+                "INNER JOIN parritcipants p2 ON c2.id = p2.id_conversation "
+                "INNER JOIN users u2 ON p2.id_user = u2.id "
+                "WHERE u2.nickname = :username "
+                "))";
+    query.prepare( queryString );
     query.bindValue(":username", user);
     bool ok = query.exec();
     if(!ok) {
         qDebug() << Q_FUNC_INFO << query.lastError().text();
     }
+    qDebug() << query.size();
     QHash<QString, QString> contacts;
     while(query.next()) {
         QString contactName = query.value(0).toString();
         QString url = query.value(1).toString();
-        contacts[contactName] = url;
+        bool hasUnread = query.value(2).toBool();
+        qDebug() << user << " has unread = " << hasUnread << "from" << contactName;
+        QString key = contactName + net::Package::delimiter() + QString::number(hasUnread);
+        qDebug() << key;
+        contacts[key] = url;
     }
     return contacts;
 }

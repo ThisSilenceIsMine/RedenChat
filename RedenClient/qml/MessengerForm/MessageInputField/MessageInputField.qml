@@ -39,7 +39,6 @@ Rectangle
             {
                 id: fileHighlight
                 maxRadius: rowLayout.btnSize + 5
-
             }
             Image
             {

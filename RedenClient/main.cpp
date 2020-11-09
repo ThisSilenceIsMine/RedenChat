@@ -46,19 +46,19 @@ int main(int argc, char *argv[])
     UserData user;
     client.setUser(&user);  
 
-//    QFile conf("config.json");
-//    QByteArray configBytes;
-//    if(!conf.open(QIODevice::ReadOnly))
+    QFile conf("config.json");
+    QByteArray configBytes;
+    if(!conf.open(QIODevice::ReadOnly))
         client.start();
-//    else {
-//        qDebug() << "Getting settings from config.json...";
-//        QJsonParseError err;
-//        QJsonDocument config = QJsonDocument::fromJson(conf.readAll(), &err);
-//        qDebug() << err.errorString();
-//        QString hostAdress = config["host_adress"].toString();
-//        quint16 port = quint16(config["port"].toInt());
-//        client.start(hostAdress,port);
-//    }
+    else {
+        qDebug() << "Getting settings from config.json...";
+        QJsonParseError err;
+        QJsonDocument config = QJsonDocument::fromJson(conf.readAll(), &err);
+        qDebug() << err.errorString();
+        QString hostAdress = config["host_adress"].toString();
+        quint16 port = quint16(config["port"].toInt());
+        client.start(hostAdress,port);
+    }
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("applicationDirPath", QGuiApplication::applicationDirPath());
