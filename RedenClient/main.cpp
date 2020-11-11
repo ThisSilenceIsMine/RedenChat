@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
 
     Client client;
 
-    QFontDatabase fontDB;
-    fontDB.addApplicationFont("qrc:/qml/fonts/OpenSansEmoji.ttf");
-    app.setFont(QFont(QStringLiteral("OpenSansEmoji")));
+//    QFontDatabase fontDB;
+//    fontDB.addApplicationFont("qrc:/qml/fonts/OpenSansEmoji.ttf");
+//    app.setFont(QFont(QStringLiteral("OpenSansEmoji")));
 
     ContactsList contactsList;
     ContactsModel contactsModel;

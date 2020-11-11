@@ -159,7 +159,7 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
     while(query.next()) {
         messages.append(
                     query.value(0).toString()                       + net::Package::delimiter() +
-                    query.value(1).toDateTime().time().toString()   + net::Package::delimiter() +
+                    query.value(1).toDateTime().toString()          + net::Package::delimiter() +
                     query.value(2).toString()
                     );
     }
@@ -180,7 +180,7 @@ QStringList DBFacade::messageHistory(QString user1, QString user2)
                       "SELECT p2.id_conversation "
                       "FROM parritcipants p2 "
                                "INNER JOIN users u2 ON p2.id_user = u2.id "
-                      "WHERE (u2.nickname = :user2) "
+                      "WHERE m.id_sender = (SELECT u3.id FROM users u3 WHERE u3.nickname = :user2 LIMIT 1) "
                   ") "
                             ")) "
                   "AND u.nickname = :user2 "

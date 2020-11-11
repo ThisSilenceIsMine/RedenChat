@@ -64,7 +64,6 @@ ListView
             border.width: 2
             border.color: Material.color(Material.DeepOrange)
             z: 5
-            visible: false
             Behavior on y
             {
                 PropertyAnimation
