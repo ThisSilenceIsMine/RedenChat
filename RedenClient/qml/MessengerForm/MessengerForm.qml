@@ -84,7 +84,7 @@ Rectangle
                         message: model.text
                         avatarSource: model.nickname == contactsModel.currentDialog() ?
                                           Qt.resolvedUrl("file:///" + contactsModel.currentAvatar())
-                                        : Qt.resolvedUrl("file:///" + applicationDirPath + "/../images/" + client.username() + "_avatar.png")
+                                        : Qt.resolvedUrl("file:///" + applicationDirPath + "/images/" + client.username() + "_avatar.png")
                                           //"qrc:/qml/Images/Default"//model.avatar
                         ListView.onAdd:
                         {

@@ -25,6 +25,7 @@ public:
 
     void setDatabase(DBFacade *database);
     void start();
+    void start(QString hostIp, quint16 port);
 private slots:
     void newConnection();
     void disconnected();

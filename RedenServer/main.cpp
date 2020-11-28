@@ -24,8 +24,19 @@ int main(int argc, char *argv[])
         databaseWrapper.setDb(&db);
 
         server.setDatabase(&databaseWrapper);
-
-        server.start();
+        QFile conf("config.json");
+        QByteArray configBytes;
+        if(!conf.open(QIODevice::ReadOnly))
+            server.start();
+        else {
+            qDebug() << "Getting settings from config.json...";
+            QJsonParseError err;
+            QJsonDocument config = QJsonDocument::fromJson(conf.readAll(), &err);
+            qDebug() << err.errorString();
+            QString hostAdress = config["host_adress"].toString();
+            quint16 port = quint16(config["port"].toInt());
+            server.start(hostAdress,port);
+        }
     }
 
     return a.exec();
