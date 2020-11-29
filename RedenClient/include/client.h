@@ -37,8 +37,8 @@ public:
 
     Q_INVOKABLE QString username() const;
 
-    void start();
-    void start(QString hostIp, quint16 port);
+    void start(QString hostIp = "127.0.0.1", quint16 port = 52484);
+
 public slots:
     void registerNewUser(QString username, QString password, QString imgUrl);
     void authorize(QString username, QString password);

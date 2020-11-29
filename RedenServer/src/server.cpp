@@ -82,7 +82,7 @@ void Server::registerUser(net::Package package, net::Connection *connection)
             //+ QDir::separator()
             + username + "_avatar.png";
 
-    ImageSerializer::fromBase64(package.data().toByteArray(),path);
+    ImageSerializer::fromBytes(package.data().toByteArray(),path);
 
     //Отправляем клиенту результат регистрации
     net::Package responce;
@@ -111,8 +111,8 @@ void Server::authorize(net::Package package, net::Connection *connection)
         item.setDestinations({username});
         item.setType(net::Package::DataType::AUTH_REQUEST);
         QString url = m_database->userImage(username);
-        QString avatarBase64 = ImageSerializer::toBase64(url);//imgRaw.toBase64();
-        item.setData(avatarBase64);
+        QString avatarRaw = ImageSerializer::toBytes(url);
+        item.setData(avatarRaw);
 
         connection->sendPackage(item);
     } else {
@@ -153,8 +153,8 @@ void Server::sendContactsList(QString user)
     while(i.hasNext()) {
         i.next();
         QString nickname = i.key();
-        QByteArray base64 = ImageSerializer::toBase64(i.value());
-        formattedContacts.append(nickname + net::Package::delimiter() + base64);
+        QByteArray bytes = ImageSerializer::toBytes(i.value());
+        formattedContacts.append(nickname + net::Package::delimiter() + bytes);
     }
     qDebug() << Q_FUNC_INFO << formattedContacts.size();
     item.setData(formattedContacts);
@@ -185,12 +185,7 @@ void Server::newConversation(const QString &user1, const QString &user2)
         sendContact(user1,user2);
         sendContact(user2,user1);
    }
-//   else
-//   {
-//       net::Package item;
-//       item.setSender("");
-//       item.setDestinations({user1});
-//   }
+
 }
 
 void Server::sendContact(const QString &to, const QString &other)
@@ -203,8 +198,8 @@ void Server::sendContact(const QString &to, const QString &other)
     item.setSender("");
     item.setType(net::Package::USER_DATA);
     item.setDestinations({to});
-    QByteArray imageBase64 = ImageSerializer::toBase64(m_database->userImage(other));
-    QString userData = other + net::Package::delimiter() + imageBase64;
+    QByteArray imageRaw = ImageSerializer::toBytes(m_database->userImage(other));
+    QString userData = other + net::Package::delimiter() + imageRaw;
 
     item.setData(userData);
 

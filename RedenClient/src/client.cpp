@@ -27,6 +27,9 @@ Client::Client(QObject *parent) : QObject(parent),
 {
     connect(&m_connection, &net::Connection::newPackage, this, &Client::packageRecieved);
 
+    if(!QDir("images").exists()) {
+        QDir().mkdir("images");
+    }
 }
 
 void Client::registerNewUser(QString username, QString password, QString imgUrl)
@@ -38,7 +41,7 @@ void Client::registerNewUser(QString username, QString password, QString imgUrl)
     package.setSender(username);
     package.setType(net::Package::DataType::REGISTRATION_REQUEST);
     package.setDestinations({password});
-    QString avatarBase64 = ImageSerializer::toBase64(fixedUrl);
+    QString avatarBase64 = ImageSerializer::toBytes(fixedUrl);
 
     package.setData(avatarBase64);
 
@@ -87,14 +90,7 @@ void Client::sendImage(QString url, QString reciver)
     package.setSender(m_user->username());
     package.setDestinations({reciver});
 
-    //    QImage image;
-    //    image.load(url);
-    //    QByteArray imgRaw;
-    //    QBuffer buff(&imgRaw);
-
-    //    image.save(&buff);
-    //    QByteArray imageBase64 = imgRaw.toBase64();
-    QByteArray imageBase64 = ImageSerializer::toBase64(url);
+    QByteArray imageBase64 = ImageSerializer::toBytes(url);
     package.setData(imageBase64);
 
 
@@ -128,7 +124,7 @@ void Client::getMessageHistory(int idx)
     } else {
         lastSelect = user;
     }
-    qDebug() << "Getting meesage jistory with user = " << user;
+    qDebug() << "Getting meesage history with user = " << user;
     net::Package package;
     package.setSender(m_user->username());
     package.setDestinations({user});
@@ -175,7 +171,7 @@ void Client::addContact(const QString &contactData)
 
     qDebug() << data;
 
-    ImageSerializer::fromBase64(imgRaw,path);
+    ImageSerializer::fromBytes(imgRaw,path);
     contactsModel()->append(item);
 
     if(data.count() == 3)
@@ -254,7 +250,7 @@ void Client::authorize(QString username, QByteArray base64)
             //+ QDir::separator()
             + username + "_avatar.png";
 
-    ImageSerializer::fromBase64(base64,path);
+    ImageSerializer::fromBytes(base64,path);
     m_user->setUsername(username);
     m_user->setImageUrl(path);
 }
@@ -272,13 +268,6 @@ void Client::setUser(UserData *user)
 QString Client::username() const
 {
     return m_user->username();
-}
-
-void Client::start()
-{
-    m_connection.createSocket();
-    m_connection.connectToHost("127.0.0.1", 52484);
-    qDebug() << "Client started";
 }
 
 void Client::start(QString hostIp, quint16 port)
@@ -323,10 +312,9 @@ void Client::packageRecieved(net::Package package)
     switch(package.type())
     {
     case net::Package::CONTACTS_LIST:
-        //qDebug() << package.data();
-
         loadContactsList(package.data().toStringList());
         break;
+
     case net::Package::REGISTRATION_REQUEST:
         if(data.startsWith("S"))
             emit registerSuccess();
@@ -344,21 +332,27 @@ void Client::packageRecieved(net::Package package)
         else
             emit authFailure();
         break;
+
     case net::Package::MESSAGE_HISTORY: //Переписка с контактом. Загружем при переключении на другой диалог
         loadMessageHistory(package.data().toStringList());
         break;
+
     case net::Package::USER_DATA: //Добавляем 1 контакт
         addContact(data);
         break;
+
     case net::Package::TEXT_MESSAGE: //Текстовое сообщение
         newMessage(package.sender() + net::Package::delimiter() + data); //никнейм$время$текст
         break;
+
     case net::Package::IMAGE:
         newImage(package.sender(), data);
         break;
+
     case net::Package::DOCUMENT:
         newDocument(package.sender(), data);
         break;
+
     }
 }
 

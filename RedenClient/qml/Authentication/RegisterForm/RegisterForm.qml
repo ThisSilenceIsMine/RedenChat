@@ -180,7 +180,7 @@ Rectangle
                 folder: shortcuts.home
                 selectMultiple: false
                 selectFolder: false
-                nameFilters: [ "Image files (*.png)" ]
+                nameFilters: [ "Image files (*.jpg *.jpeg *.gif *.bmp *.png)" ]
                 onAccepted: {
                     console.log("You chose: " + chooseAvatarDialog.fileUrl)
                     chooseAvatar.imageUrl = chooseAvatarDialog.fileUrl

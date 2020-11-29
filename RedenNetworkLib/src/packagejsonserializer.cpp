@@ -17,7 +17,7 @@ PackageJsonSerializer::PackageJsonSerializer()
 }
 
 
-QByteArray PackageJsonSerializer::toBytes(Package package)
+QByteArray PackageJsonSerializer::toBytes(const Package &package)
 {
 
     QVariantMap map;
@@ -29,7 +29,7 @@ QByteArray PackageJsonSerializer::toBytes(Package package)
     return QJsonDocument::fromVariant(map).toJson();
 }
 
-Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
+Package PackageJsonSerializer::fromBytes(const QByteArray &bytes, bool *ok)
 {
     Package package;
 
@@ -67,14 +67,12 @@ Package PackageJsonSerializer::fromBytes(QByteArray bytes, bool *ok)
         package.setData(qvariant_cast<QStringList>(data.toVariant()));
     } else {
     package.setData(data.toVariant());
-    } //.toByteArray());
+    }
     *ok = true;
     return package;
 }
 
 PackageJsonSerializer::~PackageJsonSerializer()
-{
-
-}
+{}
 
 }

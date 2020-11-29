@@ -17,8 +17,8 @@ public:
 
     // IPackageSerializer interface
 public:
-    QByteArray toBytes(Package package) override;
-    Package fromBytes(QByteArray bytes, bool *ok) override;
+    QByteArray toBytes(const Package& package) override;
+    Package fromBytes(const QByteArray& bytes, bool *ok) override;
     ~PackageJsonSerializer();
 private:
     QMetaEnum m_types;

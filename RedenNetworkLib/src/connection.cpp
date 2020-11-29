@@ -103,19 +103,15 @@ void Connection::readyRead()
     {
         if(m_socket->bytesAvailable() < int(sizeof(quint16)))
         {
-//            qDebug() << "Can't read size";
             return;
         }
 
         in >> m_blockSize;
-//        qDebug() << "Block size = " << m_blockSize;
     }
 
     if(m_socket->bytesAvailable() < m_blockSize) {
-//        qDebug() << "Not enough data. Waiting for next part";
         return;
     } else {
-//        qDebug() << m_socket->bytesAvailable() << "should be enough. Reading...";
         m_blockSize = 0;
     }
     QByteArray rawData;

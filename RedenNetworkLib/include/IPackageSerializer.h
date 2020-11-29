@@ -8,9 +8,9 @@ namespace net
 class IPackageSerializer
 {
 public:
-    virtual QByteArray toBytes(Package package) = 0;
-    virtual Package fromBytes(QByteArray bytes, bool* ok) = 0;
-    virtual ~IPackageSerializer() {}
+    virtual QByteArray toBytes(const Package &package) = 0;
+    virtual Package fromBytes(const QByteArray &bytes, bool* ok) = 0;
+    virtual ~IPackageSerializer() {};
 };
 }
 #endif // IPACKAGESERIALIZER_H

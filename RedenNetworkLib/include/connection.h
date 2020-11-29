@@ -11,6 +11,7 @@
 #include "packagejsonserializer.h"
 #include "RedenNetworkLib_global.h"
 #include "package.h"
+
 namespace net
 {
 
